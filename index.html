@@ -1,12 +1,716 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Mi web</title>
-  </head>
-  <body>
-    <h1>Hola, GitHub Pages ✅</h1>
-    <p>Si ves esto, ya está publicado.</p>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catálogo</title>
+
+  <style>
+    :root{
+      --bg:#0b0f17;
+      --card:#121a26;
+      --card2:#0f1624;
+      --text:#e2e8f0;
+      --muted:#94a3b8;
+      --border: rgba(148,163,184,.15);
+
+      --accent:#38bdf8;   /* precio */
+      --ok:#22c55e;       /* stock */
+      --bad:#ef4444;      /* agotado */
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
+      color:var(--text);
+      background: linear-gradient(180deg, #070a10, var(--bg));
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:26px 16px 64px;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-bottom:16px;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.2px;
+    }
+    .brand .sub{
+      margin-top:6px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .tools{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    input[type="search"]{
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      outline: none;
+      min-width: 260px;
+    }
+
+    .btn{
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      transition: border-color .15s ease, transform .05s ease;
+    }
+    .btn:hover{ border-color: rgba(56,189,248,.5); }
+    .btn:active{ transform: translateY(1px); }
+
+    /* ✅ Portal Clientes */
+    .btn-portal{
+      background: linear-gradient(90deg, rgba(34,197,94,.22), rgba(56,189,248,.12));
+      border-color: rgba(34,197,94,.35);
+      font-weight: 800;
+    }
+    .btn-portal:hover{ border-color: rgba(34,197,94,.6); }
+
+    /* GRID (PC / tablet) */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width:980px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+
+    /* En móvil: ocultamos grid y usamos carrusel */
+    @media (max-width:640px){
+      .grid{ display:none; }
+      input[type="search"]{ min-width: 100%; width:100%; }
+    }
+
+    .card{
+      background: rgba(18,26,38,.95);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height:100%;
+    }
+
+    .img{
+      aspect-ratio: 16/10;
+      background:#0a1020;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .img img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .content{
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      flex:1;
+    }
+
+    .name{
+      font-weight: 800;
+      font-size: 15px;
+      line-height:1.2;
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .price{
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--accent);
+      letter-spacing:.2px;
+    }
+
+    .badge{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      color: var(--muted);
+    }
+    .badge.ok{
+      color: #bbf7d0;
+      border-color: rgba(34,197,94,.35);
+      background: rgba(34,197,94,.08);
+    }
+    .badge.bad{
+      color: #fecaca;
+      border-color: rgba(239,68,68,.35);
+      background: rgba(239,68,68,.08);
+    }
+
+    .actions{
+      margin-top:auto;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn-primary{
+      background: linear-gradient(90deg, rgba(56,189,248,.18), rgba(56,189,248,.08));
+      border-color: rgba(56,189,248,.35);
+    }
+
+    .status{
+      font-size: 13px;
+      color: var(--muted);
+      margin-top:8px;
+    }
+
+    /* CARRUSEL SOLO MÓVIL */
+    .carousel{
+      display:none;
+      margin-top:14px;
+    }
+    @media (max-width:640px){
+      .carousel{ display:block; }
+    }
+    .carousel-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .carousel-ind{
+      font-size:13px;
+      color:var(--muted);
+    }
+    .carousel-stage{
+      width:100%;
+    }
+
+    /* Modal */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index: 50;
+    }
+
+    .modal{
+      width: min(900px, 100%);
+      background: rgba(18,26,38,.98);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      max-height: 92vh;
+    }
+
+    .modal-header{
+      padding:14px 14px 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title{
+      font-weight:900;
+      font-size:16px;
+      line-height:1.2;
+    }
+
+    .modal-body{
+      padding:14px;
+      overflow:auto;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+    }
+
+    @media (max-width:820px){
+      .modal-body{
+        display:flex;
+        flex-direction:column;
+      }
+      .modal-img{ order:1; }
+      .modal-side{ order:2; }
+    }
+
+    .modal-img{
+      aspect-ratio: 16/10;
+      background:#0a1020;
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid var(--border);
+    }
+    .modal-img img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .desc{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding:12px;
+      background: rgba(15,22,36,.45);
+    }
+
+    .close{
+      width:40px; height:40px;
+      display:grid; place-items:center;
+      border-radius:12px;
+      background: var(--card2);
+      border: 1px solid rgba(255,255,255,.22);
+      color: #fff;
+      font-weight: 800;
+      cursor:pointer;
+    }
+
+    .modal-side{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .form-row{ display:flex; flex-direction:column; gap:6px; }
+    label{ font-size:12px; color: var(--muted); }
+    .field{
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      outline:none;
+      width:100%;
+    }
+    textarea.field{ min-height: 86px; resize: vertical; }
+
+    .form-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    .note{
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>🧾 Catálogo de Servicios</h1>
+        <div class="sub">Selecciona un servicio y revisa los detalles.</div>
+      </div>
+
+      <div class="tools">
+        <button class="btn btn-portal" id="btnPortal">👤 Portal Clientes</button>
+        <input id="q" type="search" placeholder="Buscar por nombre..." />
+        <button class="btn" id="btnReload">🔄 Actualizar</button>
+      </div>
+    </header>
+
+    <div class="status" id="status">Cargando…</div>
+
+    <!-- CARRUSEL (solo móvil) -->
+    <div class="carousel" id="carousel">
+      <div class="carousel-top">
+        <div class="carousel-ind" id="carInd">—</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn" id="carPrev">◀</button>
+          <button class="btn" id="carNext">▶</button>
+        </div>
+      </div>
+      <div class="carousel-stage" id="carStage"></div>
+    </div>
+
+    <!-- GRID (PC / tablet) -->
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- Modal Detalles -->
+  <div class="overlay" id="overlayDetalles" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="dtNombre">—</div>
+          <div class="status" style="margin-top:6px">
+            <span class="price" id="dtPrecio">—</span>
+            <span style="margin-left:10px" id="dtStock"></span>
+          </div>
+        </div>
+        <button class="close" id="btnCerrarDetalles" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-img" id="dtImgWrap"></div>
+
+        <div class="modal-side">
+          <div class="desc" id="dtDesc">—</div>
+
+          <div id="zonaAgotado" style="display:none;">
+            <button class="btn btn-primary" id="btnAvisame">📩 Avísame cuando haya stock</button>
+            <div class="note" style="margin-top:6px;">
+              Te pediremos tu nombre y celular para registrarlo.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Form Avisame -->
+  <div class="overlay" id="overlayAvisame" role="dialog" aria-modal="true">
+    <div class="modal" style="width:min(520px, 100%);">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">📩 Avísame cuando haya stock</div>
+          <div class="status" id="avServicio">Servicio: —</div>
+        </div>
+        <button class="close" id="btnCerrarAvisame" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body" style="grid-template-columns:1fr;">
+        <div class="modal-side">
+          <div class="form-row">
+            <label>Nombre (obligatorio)</label>
+            <input class="field" id="avNombre" placeholder="Tu nombre" />
+          </div>
+
+          <div class="form-row">
+            <label>Celular (obligatorio)</label>
+            <input class="field" id="avCelular" placeholder="+51 999 999 999" />
+          </div>
+
+          <div class="form-row">
+            <label>Mensaje (opcional)</label>
+            <textarea class="field" id="avMensaje" placeholder="¿Qué plan te interesa?"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" id="btnEnviarAvisame">Enviar</button>
+            <button class="btn" id="btnCancelarAvisame">Cancelar</button>
+          </div>
+
+          <div class="status" id="avStatus"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ TU WORKER
+    const API_BASE = "https://chesttop-api.fam-premium2720.workers.dev";
+
+    let servicios = [];
+    let seleccionado = null;
+
+    // Carrusel móvil
+    let carIndex = 0;
+    let carFiltered = [];
+
+    const $ = (id) => document.getElementById(id);
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function toNumberStock(stock){
+      const raw = String(stock ?? "").trim();
+      if (raw === "") return 0;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    // ✅ Stock sin números
+    function stockBadge(stock){
+      const n = toNumberStock(stock);
+      if (n > 0) return `<span class="badge ok">✅ Hay stock</span>`;
+      return `<span class="badge bad">⛔ Agotado</span>`;
+    }
+
+    function priceText(p){
+      const v = String(p ?? "").trim();
+      return v ? `S/ ${escapeHtml(v)}` : "Consultar";
+    }
+
+    function buildCardHTML(x, i){
+      const img = x.imagen
+        ? `<img src="${escapeHtml(x.imagen)}" alt="${escapeHtml(x.nombre)}" loading="lazy">`
+        : `<div class="status">Sin imagen</div>`;
+
+      return `
+        <div class="card">
+          <div class="img">${img}</div>
+          <div class="content">
+            <div class="name">${escapeHtml(x.nombre || "Sin nombre")}</div>
+
+            <div class="row">
+              <div class="price">${priceText(x.precio)}</div>
+              <div>${stockBadge(x.stock)}</div>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-primary" onclick="openDetalles(${i})">Ver detalles</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getFiltered(){
+      const q = $("q").value.trim().toLowerCase();
+      return servicios.filter(x => (x.nombre || "").toLowerCase().includes(q));
+    }
+
+    function render(){
+      const list = getFiltered();
+
+      $("status").textContent = `Mostrando ${list.length} de ${servicios.length} servicios`;
+
+      // GRID (PC)
+      $("grid").innerHTML = list.map((x, i) => buildCardHTML(x, i)).join("");
+
+      // Carrusel (móvil)
+      carFiltered = list;
+      if (carIndex >= carFiltered.length) carIndex = Math.max(0, carFiltered.length - 1);
+      renderCarousel();
+    }
+
+    function renderCarousel(){
+      const total = carFiltered.length;
+
+      if (total === 0){
+        $("carInd").textContent = "Sin resultados";
+        $("carStage").innerHTML = "";
+        return;
+      }
+
+      $("carInd").textContent = `${carIndex + 1} / ${total}`;
+
+      const x = carFiltered[carIndex];
+      const realIndex = servicios.indexOf(x);
+
+      $("carStage").innerHTML = buildCardHTML(x, realIndex);
+
+      $("carPrev").disabled = (carIndex === 0);
+      $("carNext").disabled = (carIndex === total - 1);
+    }
+
+    function carPrev(){
+      if (carIndex > 0){
+        carIndex--;
+        renderCarousel();
+      }
+    }
+    function carNext(){
+      if (carIndex < carFiltered.length - 1){
+        carIndex++;
+        renderCarousel();
+      }
+    }
+
+    function openDetalles(index){
+      seleccionado = servicios[index];
+      if (!seleccionado) return;
+
+      $("dtNombre").textContent = seleccionado.nombre || "—";
+      $("dtPrecio").innerHTML = priceText(seleccionado.precio);
+      $("dtStock").innerHTML = stockBadge(seleccionado.stock);
+      $("dtDesc").textContent = seleccionado.descripcion || "—";
+
+      $("dtImgWrap").innerHTML = seleccionado.imagen
+        ? `<img src="${escapeHtml(seleccionado.imagen)}" alt="${escapeHtml(seleccionado.nombre)}">`
+        : `<div class="status" style="padding:14px">Sin imagen</div>`;
+
+      const n = toNumberStock(seleccionado.stock);
+      $("zonaAgotado").style.display = (n <= 0) ? "block" : "none";
+
+      $("overlayDetalles").style.display = "flex";
+    }
+
+    function closeDetalles(){
+      $("overlayDetalles").style.display = "none";
+    }
+
+    function openAvisame(){
+      if (!seleccionado) return;
+      $("avServicio").textContent = `Servicio: ${seleccionado.nombre || "—"}`;
+      $("avNombre").value = "";
+      $("avCelular").value = "";
+      $("avMensaje").value = "";
+      $("avStatus").textContent = "";
+      $("overlayAvisame").style.display = "flex";
+    }
+
+    function closeAvisame(){
+      $("overlayAvisame").style.display = "none";
+    }
+
+    function enviarAvisame(){
+      if (!seleccionado) return;
+
+      const nombre = $("avNombre").value.trim();
+      const celular = $("avCelular").value.trim();
+      const mensaje = $("avMensaje").value.trim();
+
+      if (!nombre){
+        $("avStatus").textContent = "❌ El nombre es obligatorio.";
+        return;
+      }
+      if (!celular){
+        $("avStatus").textContent = "❌ El celular es obligatorio.";
+        return;
+      }
+
+      $("avStatus").textContent = "Enviando…";
+
+      fetch(`${API_BASE}/api/alerta-stock`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          servicio: seleccionado.nombre || "",
+          celular,
+          nombre,
+          mensaje
+        })
+      })
+      .then(r => r.json())
+      .then((resp) => {
+        if (!resp.ok) throw new Error(resp.error || "No ok");
+        $("avStatus").textContent = "✅ Listo. Registramos tu solicitud.";
+        setTimeout(() => {
+          closeAvisame();
+          closeDetalles();
+        }, 800);
+      })
+      .catch(err => {
+        $("avStatus").textContent = "❌ Error: " + (err?.message || err);
+      });
+    }
+
+    // ✅ Carga catálogo desde Worker
+    async function load(){
+      $("status").textContent = "Cargando…";
+
+      try{
+        const res = await fetch(`${API_BASE}/api/catalogo`, { method: "GET" });
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.error || "No ok");
+
+        servicios = Array.isArray(data.items) ? data.items : [];
+        carIndex = 0;
+        render();
+      }catch(err){
+        $("status").textContent = "Error cargando catálogo: " + (err?.message || err);
+      }
+    }
+
+    // Eventos
+    $("btnPortal").addEventListener("click", () => {
+      window.open("portal.html", "_blank", "noopener,noreferrer");
+    });
+
+    $("q").addEventListener("input", () => {
+      carIndex = 0;
+      render();
+    });
+    $("btnReload").addEventListener("click", load);
+
+    $("carPrev").addEventListener("click", carPrev);
+    $("carNext").addEventListener("click", carNext);
+
+    (function enableSwipe(){
+      let startX = 0, startY = 0, tracking = false;
+
+      $("carStage").addEventListener("touchstart", (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        tracking = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, {passive:true});
+
+      $("carStage").addEventListener("touchend", (e) => {
+        if (!tracking) return;
+        tracking = false;
+
+        const t = e.changedTouches && e.changedTouches[0];
+        if (!t) return;
+
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+
+        if (Math.abs(dy) > Math.abs(dx)) return;
+
+        if (dx < -40) carNext();
+        else if (dx > 40) carPrev();
+      }, {passive:true});
+    })();
+
+    $("btnCerrarDetalles").addEventListener("click", closeDetalles);
+    $("overlayDetalles").addEventListener("click", (e) => {
+      if (e.target === $("overlayDetalles")) closeDetalles();
+    });
+
+    $("btnAvisame").addEventListener("click", openAvisame);
+
+    $("btnCerrarAvisame").addEventListener("click", closeAvisame);
+    $("btnCancelarAvisame").addEventListener("click", closeAvisame);
+    $("btnEnviarAvisame").addEventListener("click", enviarAvisame);
+
+    $("overlayAvisame").addEventListener("click", (e) => {
+      if (e.target === $("overlayAvisame")) closeAvisame();
+    });
+
+    load();
+  </script>
+</body>
 </html>
