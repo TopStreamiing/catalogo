@@ -34,9 +34,7 @@
 
     .wrap{ max-width: 860px; margin: 0 auto; padding: 26px 16px 44px; }
 
-    .header{
-      display:flex; gap:14px; align-items:center; margin-bottom:18px; flex-wrap:wrap;
-    }
+    .header{ display:flex; gap:14px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
 
     .logo{
       height:72px; width:auto; border-radius: 14px;
@@ -54,7 +52,6 @@
       margin-right:8px; vertical-align: middle;
     }
 
-    /* Botón llamativo volver catálogo */
     .catalogBtn{
       margin-left:auto;
       display:flex;
@@ -64,17 +61,15 @@
       border-radius: 14px;
       text-decoration:none;
       color: #fff;
-      background:
-        linear-gradient(180deg, rgba(34,197,94,.22), rgba(34,197,94,.08));
+      background: linear-gradient(180deg, rgba(34,197,94,.22), rgba(34,197,94,.08));
       border: 1px solid rgba(34,197,94,.30);
       box-shadow: 0 14px 40px rgba(0,0,0,.28);
-      position: relative;
-      overflow:hidden;
       transition: .16s ease;
       white-space: nowrap;
       min-width: 210px;
       align-items:flex-start;
       cursor:pointer;
+      user-select:none;
     }
     .catalogBtn:hover{ transform: translateY(-1px); border-color: rgba(34,197,94,.55); }
     .catalogTitle{ font-weight: 1000; font-size: 13px; display:flex; align-items:center; gap:8px; letter-spacing: .2px; }
@@ -199,7 +194,6 @@
       font-size: 13px;
       line-height: 1.35;
       min-height: 44px;
-      white-space: pre-line;
     }
 
     .loader{
@@ -254,7 +248,6 @@
 
 <body>
   <div class="wrap">
-
     <div class="header">
       <img class="logo" id="logoImg" alt="Logo" onerror="this.style.display='none'">
 
@@ -270,7 +263,6 @@
     </div>
 
     <div class="card">
-
       <div class="tabs">
         <div id="tabNetflix" class="tab active" onclick="switchTab('netflix')">Código Netflix</div>
         <div id="tabDisney" class="tab" onclick="switchTab('disney')">Código Disney</div>
@@ -406,6 +398,12 @@ Este caso no se resuelve con código automático.
 
 ✅ Tip: Si te salen las opciones “Estoy de viaje” o “Ver temporalmente”, ahí sí podemos generarte el enlace/código desde el portal.`;
 
+  // Netflix "no_email" copy aprobado
+  const NETFLIX_NO_EMAIL_COPY =
+`⏳ Espera 60 segundos y presiona Reintentar.
+📌 NO dar clic en "Reenviar email".
+Si aún no llega el código, contacta soporte por WhatsApp.`;
+
   document.getElementById("btnCatalog").addEventListener("click", () => {
     window.open(CATALOG_URL, "_self");
   });
@@ -432,6 +430,23 @@ Este caso no se resuelve con código automático.
       localStorage.setItem(k, id);
     }
     return id;
+  }
+
+  // Mask email: 2 first + *** + last + @domain
+  function maskEmail(email){
+    const e = String(email || "").trim();
+    const at = e.lastIndexOf("@");
+    if(at < 0) return e;
+    const user = e.slice(0, at);
+    const dom = e.slice(at);
+
+    if(user.length === 0) return "***" + dom;
+    if(user.length === 1) return user[0] + "***" + dom;
+    if(user.length === 2) return user.slice(0,2) + "***" + dom;
+
+    const first2 = user.slice(0,2);
+    const last1 = user.slice(-1);
+    return `${first2}***${last1}${dom}`;
   }
 
   function switchTab(which){
@@ -487,70 +502,149 @@ Este caso no se resuelve con código automático.
     }
   }
 
+  /* ======= COOLDOWN ======= */
+  function setButtonsDisabled(ids, disabled){
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.disabled = !!disabled;
+    });
+  }
+
+  function startCooldown(buttonIds, seconds, retryIdToLabel){
+    const until = Date.now() + seconds * 1000;
+    setButtonsDisabled(buttonIds, true);
+
+    const retryBtn = retryIdToLabel ? document.getElementById(retryIdToLabel) : null;
+    const originalRetryText = retryBtn ? retryBtn.textContent : "";
+
+    const tick = () => {
+      const left = until - Date.now();
+      if(left <= 0){
+        setButtonsDisabled(buttonIds, false);
+        if(retryBtn) retryBtn.textContent = originalRetryText || "Reintentar";
+        return;
+      }
+      if(retryBtn) retryBtn.textContent = `Reintentar (${Math.ceil(left/1000)}s)`;
+      requestAnimationFrame(tick);
+    };
+    tick();
+  }
+
   function renderNetflix(res){
+    const emailMasked = esc(maskEmail(res.email || ""));
     const time = esc(res.timeText || "");
     const status = esc(res.statusText || "");
     const link = (res.link || "").trim();
 
-    let cls = "greenTitle", icon = "✅";
-    if(res.kind === "expired"){ cls = "yellowTitle"; icon = "⚠️"; }
+    const isExpired = (res.kind === "expired");
+    const titleCls = isExpired ? "yellowTitle" : "greenTitle";
+    const icon = isExpired ? "⚠️" : "✅";
+
+    if(res.kind === "no_email"){
+      return `
+        <div class="resultTitle redTitle">❌ Aún no recibimos el correo de Netflix</div>
+        <div class="line">Correo: <b>${emailMasked}</b></div>
+        <div class="line">📩 <span class="label2">Buscado en:</span> <b>${emailMasked}</b></div>
+        <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso temporal de Netflix</b></div>
+        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
+          ${esc(NETFLIX_NO_EMAIL_COPY)}
+        </div>
+      `;
+    }
 
     let linkBlock = "";
-    if(res.kind === "valid" && link){
+    if(!isExpired && link){
       linkBlock = `
         <div class="boxLink">${esc(link)}</div>
-        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn primary" onclick="window.open('${esc(link)}','_blank')">Abrir enlace</button>
           <button class="btn ghost" onclick="copyText('${esc(link)}')">Copiar enlace</button>
         </div>
       `;
-    } else if(res.kind === "expired"){
-      linkBlock = `
-        <div style="margin-top:12px; color: rgba(234,240,255,.75); font-size: 12px; line-height: 1.35;">
-          📝 Este correo ya no es válido (superó los 15 minutos).
-          <br>Reintenta para que tome el último correo enviado.
+    }
+
+    let expireBlock = "";
+    if(isExpired){
+      expireBlock = `
+        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35;">
+          📝 Este correo ya no es válido (superó los 15 minutos).<br>
+          Reintenta para que tome el último código enviado o reenvía el email desde tu dispositivo.
         </div>
       `;
     }
 
     return `
-      <div class="resultTitle ${cls}">${icon} Tu código de acceso temporal de Netflix</div>
+      <div class="resultTitle ${titleCls}">${icon} Tu código de acceso temporal de Netflix</div>
+      <div class="line">Correo: <b>${emailMasked}</b></div>
       ${time ? `<div class="line">🕒 <span class="label2">Hora:</span> <b>${time} (PET)</b></div>` : ``}
       <div class="line">📌 <span class="label2">Estado:</span> <b>${status}</b></div>
-      ${linkBlock}
+      <div class="line">📩 <span class="label2">Buscado en:</span> <b>${emailMasked}</b></div>
+      <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso temporal de Netflix</b></div>
+      ${linkBlock || expireBlock}
     `;
   }
 
   function renderDisney(res){
+    const emailMasked = esc(maskEmail(res.email || ""));
     const time = esc(res.timeText || "");
     const status = esc(res.statusText || "");
     const code = String(res.code || "").trim();
 
-    let cls = "greenTitle", icon = "✅";
-    if(res.kind === "expired"){ cls = "yellowTitle"; icon = "⚠️"; }
+    const isExpired = (res.kind === "expired");
+    const titleCls = isExpired ? "yellowTitle" : "greenTitle";
+    const icon = isExpired ? "⚠️" : "✅";
+
+    if(res.kind === "domain_not_supported"){
+      return `
+        <div class="resultTitle redTitle">⚠️ Solicitud no disponible</div>
+        <div class="line">Correo: <b>${emailMasked}</b></div>
+        <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso único para Disney+</b></div>
+        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
+          ${esc(res.message || "Este correo no está habilitado para códigos automáticos. Contacta soporte.")}
+        </div>
+      `;
+    }
+
+    if(res.kind === "no_email"){
+      return `
+        <div class="resultTitle redTitle">❌ Aún no recibimos el correo de Disney+</div>
+        <div class="line">Correo: <b>${emailMasked}</b></div>
+        <div class="line">📩 <span class="label2">Buscado en:</span> <b>${emailMasked}</b></div>
+        <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso único para Disney+</b></div>
+        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
+          ${esc(res.message || "⏳ Espera 60 segundos y presiona Reintentar. Si persiste, contacta soporte.")}
+        </div>
+      `;
+    }
 
     let codeBlock = "";
-    if(res.kind === "valid" && code){
+    if(!isExpired && code){
       codeBlock = `
         <div class="otpBox">${esc(code)}</div>
-        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn primary" onclick="copyText('${esc(code)}')">📋 Copiar código</button>
         </div>
       `;
-    } else if(res.kind === "expired"){
-      codeBlock = `
-        <div style="margin-top:12px; color: rgba(234,240,255,.75); font-size: 12px; line-height: 1.35;">
-          📝 Este correo ya no es válido (superó los 15 minutos).
-          <br>Reintenta para que tome el último correo enviado.
+    }
+
+    let expireBlock = "";
+    if(isExpired){
+      expireBlock = `
+        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35;">
+          📝 Este correo ya no es válido (superó los 15 minutos).<br>
+          Reintenta para que tome el último código enviado o vuelve a solicitar el email desde tu dispositivo.
         </div>
       `;
     }
 
     return `
-      <div class="resultTitle ${cls}">${icon} Tu código de acceso único para Disney+</div>
+      <div class="resultTitle ${titleCls}">${icon} Tu código de acceso único para Disney+</div>
+      <div class="line">Correo: <b>${emailMasked}</b></div>
       ${time ? `<div class="line">🕒 <span class="label2">Hora:</span> <b>${time} (PET)</b></div>` : ``}
       <div class="line">📌 <span class="label2">Estado:</span> <b>${status}</b></div>
-      ${codeBlock}
+      <div class="line">📩 <span class="label2">Buscado en:</span> <b>${emailMasked}</b></div>
+      <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso único para Disney+</b></div>
+      ${codeBlock || expireBlock}
     `;
   }
 
@@ -560,9 +654,18 @@ Este caso no se resuelve con código automático.
       <div class="line">📌 <span class="label2">Plataforma:</span> <b>${esc(res.platform || "")}</b></div>
       <div class="line">📧 <span class="label2">Correo:</span> <b>${esc(res.email || "")}</b></div>
       <div class="line">🔑 <span class="label2">Contraseña:</span> <b>${esc(res.password || "")}</b></div>
-      <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+      <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn ghost" onclick="copyText('${esc(res.password || "")}')">Copiar contraseña</button>
         <button class="btn ghost" onclick="copyText('${esc(res.email || "")}')">Copiar correo</button>
+      </div>
+    `;
+  }
+
+  function renderSimpleWarn(title, msg){
+    return `
+      <div class="resultTitle yellowTitle">${esc(title)}</div>
+      <div style="color:rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
+        ${esc(msg)}
       </div>
     `;
   }
@@ -572,6 +675,9 @@ Este caso no se resuelve con código automático.
   function retryNetflix(){ runNetflix(); }
 
   async function runNetflix(){
+    // 🔒 Cooldown 30s: Buscar + Reintentar
+    startCooldown(["btnSearchNetflix","btnRetryNetflix"], 30, "btnRetryNetflix");
+
     const phone = (document.getElementById("phoneNetflix").value || "").trim();
     const pin = (document.getElementById("pinNetflix").value || "").trim();
     const opcion = document.getElementById("opcionNetflix").value;
@@ -579,15 +685,11 @@ Este caso no se resuelve con código automático.
     outHTML("outNetflix", "");
     setLoader("loaderNetflix", true);
 
+    // Simulación front para Actualizar hogar (no API, no consume intentos)
     if (opcion === "Actualizar hogar") {
       setTimeout(() => {
         setLoader("loaderNetflix", false);
-        outHTML("outNetflix", `
-          <div class="resultTitle yellowTitle">🏠 Actualizar hogar</div>
-          <div style="color:rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
-            ${esc(UPDATE_HOME_MESSAGE)}
-          </div>
-        `);
+        outHTML("outNetflix", renderSimpleWarn("🏠 Actualizar hogar (Netflix)", UPDATE_HOME_MESSAGE));
       }, 1200);
       return;
     }
@@ -607,6 +709,13 @@ Este caso no se resuelve con código automático.
         outHTML("outNetflix", renderNetflix(data));
         return;
       }
+
+      // Si el backend manda “no_email” lo renderizamos con copy definido
+      if(data && data.kind === "no_email"){
+        outHTML("outNetflix", renderNetflix({ kind:"no_email", email: data.email || "" }));
+        return;
+      }
+
       outHTML("outNetflix", renderError("No se pudo completar", data.message || "Intenta nuevamente."));
     }catch(e){
       setLoader("loaderNetflix", false);
@@ -619,6 +728,9 @@ Este caso no se resuelve con código automático.
   function retryDisney(){ runDisney(); }
 
   async function runDisney(){
+    // 🔒 Cooldown 30s: Buscar + Reintentar
+    startCooldown(["btnSearchDisney","btnRetryDisney"], 30, "btnRetryDisney");
+
     const phone = (document.getElementById("phoneDisney").value || "").trim();
     const pin = (document.getElementById("pinDisney").value || "").trim();
     const motivo = document.getElementById("motivoDisney").value;
@@ -641,6 +753,12 @@ Este caso no se resuelve con código automático.
         outHTML("outDisney", renderDisney(data));
         return;
       }
+
+      if(data && (data.kind === "domain_not_supported" || data.kind === "no_email")){
+        outHTML("outDisney", renderDisney(data));
+        return;
+      }
+
       outHTML("outDisney", renderError("No se pudo completar", data.message || "Intenta nuevamente."));
     }catch(e){
       setLoader("loaderDisney", false);
@@ -650,6 +768,9 @@ Este caso no se resuelve con código automático.
 
   // ---------- ACCOUNT ----------
   async function checkAccount(){
+    // 🔒 Cooldown 10s
+    startCooldown(["btnAccount"], 10, null);
+
     const phone = (document.getElementById("phoneAccount").value || "").trim();
     const platform = document.getElementById("platform").value;
 
@@ -671,6 +792,7 @@ Este caso no se resuelve con código automático.
         outHTML("outAccount", renderAccount(data));
         return;
       }
+
       outHTML("outAccount", renderError("No se encontró información", data.message || "Verifica los datos."));
     }catch(e){
       setLoader("loaderAccount", false);
@@ -679,7 +801,6 @@ Este caso no se resuelve con código automático.
   }
 
   (function init(){
-    // fill platforms
     const sel = document.getElementById("platform");
     sel.innerHTML = "";
     PLATFORMS.forEach(p => {
@@ -689,14 +810,9 @@ Este caso no se resuelve con código automático.
       sel.appendChild(o);
     });
 
-    // init remain chips
     setRemain("remainNetflix", null);
     setRemain("remainDisney", null);
     setRemain("remainAccount", null);
-
-    // Optional: Enter triggers search (Netflix/Disney)
-    document.getElementById("pinNetflix").addEventListener("keydown", (e)=>{ if(e.key==="Enter") runNetflix(); });
-    document.getElementById("pinDisney").addEventListener("keydown", (e)=>{ if(e.key==="Enter") runDisney(); });
   })();
 </script>
 </body>
