@@ -90,6 +90,25 @@
     }
     .btn-portal:hover{ border-color: rgba(34,197,94,.6); }
 
+    .btn-wa{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  font-weight: 900;
+  background: linear-gradient(90deg, rgba(34,197,94,.24), rgba(34,197,94,.10));
+  border-color: rgba(34,197,94,.40);
+}
+.btn-wa:hover{
+  border-color: rgba(34,197,94,.70);
+}
+.wa-dot{
+  width:10px;height:10px;border-radius:999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.18);
+}
+
+
     /* GRID (PC / tablet) */
     .grid{
       display:grid;
@@ -345,11 +364,17 @@
         <div class="sub">Selecciona un servicio y revisa los detalles.</div>
       </div>
 
-      <div class="tools">
-        <button class="btn btn-portal" id="btnPortal">👤 Portal Clientes</button>
-        <input id="q" type="search" placeholder="Buscar por nombre..." />
-        <button class="btn" id="btnReload">🔄 Actualizar</button>
-      </div>
+<div class="tools">
+  <button class="btn btn-portal" id="btnPortal">👤 Portal Clientes</button>
+
+  <a class="btn btn-wa" href="https://wa.link/fzemlu" target="_blank" rel="noopener">
+    <span class="wa-dot"></span> WhatsApp
+  </a>
+
+  <input id="q" type="search" placeholder="Buscar por nombre..." />
+  <button class="btn" id="btnReload">🔄 Actualizar</button>
+</div>
+
     </header>
 
     <div class="status" id="status">Cargando…</div>
