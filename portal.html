@@ -34,7 +34,9 @@
 
     .wrap{ max-width: 860px; margin: 0 auto; padding: 26px 16px 44px; }
 
-    .header{ display:flex; gap:14px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
+    .header{
+      display:flex; gap:14px; align-items:center; margin-bottom:18px; flex-wrap:wrap;
+    }
 
     .logo{
       height:72px; width:auto; border-radius: 14px;
@@ -53,7 +55,7 @@
     }
 
     /* Botón llamativo volver catálogo */
-    .backBtn{
+    .catalogBtn{
       margin-left:auto;
       display:flex;
       flex-direction:column;
@@ -62,7 +64,8 @@
       border-radius: 14px;
       text-decoration:none;
       color: #fff;
-      background: linear-gradient(180deg, rgba(34,197,94,.22), rgba(34,197,94,.08));
+      background:
+        linear-gradient(180deg, rgba(34,197,94,.22), rgba(34,197,94,.08));
       border: 1px solid rgba(34,197,94,.30);
       box-shadow: 0 14px 40px rgba(0,0,0,.28);
       position: relative;
@@ -71,11 +74,15 @@
       white-space: nowrap;
       min-width: 210px;
       align-items:flex-start;
+      cursor:pointer;
     }
-    .backBtn:hover{ transform: translateY(-1px); border-color: rgba(34,197,94,.55); }
-    .backTitle{ font-weight:1000; font-size: 13px; display:flex; align-items:center; gap:8px; letter-spacing:.2px; }
-    .backSub{ font-size: 11.5px; color: rgba(234,240,255,.78); font-weight: 800; }
-    @media (max-width: 620px){ .backSub{ display:none; } .backBtn{ min-width: unset; padding:10px 12px; } }
+    .catalogBtn:hover{ transform: translateY(-1px); border-color: rgba(34,197,94,.55); }
+    .catalogTitle{ font-weight: 1000; font-size: 13px; display:flex; align-items:center; gap:8px; letter-spacing: .2px; }
+    .catalogSub{ font-size: 11.5px; color: rgba(234,240,255,.78); font-weight: 800; }
+    @media (max-width: 620px){
+      .catalogBtn{ min-width: unset; padding: 10px 12px; }
+      .catalogSub{ display:none; }
+    }
 
     .card{
       background: var(--card);
@@ -107,7 +114,14 @@
     }
 
     .grid{ display:grid; gap: 12px; }
-    label{ display:block; font-size: 12px; color: var(--muted); font-weight: 900; margin-bottom: 8px; }
+
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
 
     input, select{
       width:100%;
@@ -120,6 +134,7 @@
       font-size: 14px;
       outline:none;
     }
+
     input::placeholder{ color: rgba(234,240,255,.45); }
 
     .actions{
@@ -139,6 +154,7 @@
       font-size: 14px;
       transition:.15s ease;
     }
+
     .btn.primary{
       background: linear-gradient(135deg, var(--primary), var(--primary2));
       color: #fff;
@@ -183,6 +199,7 @@
       font-size: 13px;
       line-height: 1.35;
       min-height: 44px;
+      white-space: pre-line;
     }
 
     .loader{
@@ -246,10 +263,10 @@
         <p>Selecciona una opción para continuar. (Hora de referencia: PET)</p>
       </div>
 
-      <a class="backBtn" id="backCatalog" href="#" rel="noopener">
-        <div class="backTitle">🛍️ Volver al catálogo</div>
-        <div class="backSub">Ver planes y disponibilidad →</div>
-      </a>
+      <div class="catalogBtn" id="btnCatalog">
+        <div class="catalogTitle">🛍️ Volver al catálogo</div>
+        <div class="catalogSub">Ver planes y disponibilidad →</div>
+      </div>
     </div>
 
     <div class="card">
@@ -286,7 +303,7 @@
         <div class="actions">
           <button id="btnSearchNetflix" class="btn primary" onclick="searchNetflix()">Buscar código</button>
           <button id="btnRetryNetflix" class="btn ghost" onclick="retryNetflix()">Reintentar</button>
-          <span id="remainNetflix" class="chip">Te quedan —</span>
+          <span id="remainNetflix" class="chip">Te quedan — de 5</span>
         </div>
 
         <div id="loaderNetflix" class="loader">🔎 Buscando…</div>
@@ -324,7 +341,7 @@
         <div class="actions">
           <button id="btnSearchDisney" class="btn primary" onclick="searchDisney()">Buscar código</button>
           <button id="btnRetryDisney" class="btn ghost" onclick="retryDisney()">Reintentar</button>
-          <span id="remainDisney" class="chip">Te quedan —</span>
+          <span id="remainDisney" class="chip">Te quedan — de 5</span>
         </div>
 
         <div id="loaderDisney" class="loader">🔎 Buscando código…</div>
@@ -352,7 +369,7 @@
 
         <div class="actions">
           <button id="btnAccount" class="btn primary" onclick="checkAccount()">🧾 Revisar mi cuenta</button>
-          <span id="remainAccount" class="chip">Te quedan —</span>
+          <span id="remainAccount" class="chip">Te quedan — de 5</span>
         </div>
 
         <div id="loaderAccount" class="loader">🔎 Verificando…</div>
@@ -363,14 +380,36 @@
   </div>
 
 <script>
-  // ✅ CAMBIA ESTO
-  const API_BASE = "https://chesttop-api.fam-premium2720.workers.dev";  // tu Worker
-  const CATALOG_URL = "https://www.chesttop.com/";                      // tu catálogo
-  const LOGO_URL = ""; // opcional (si quieres un logo, pega URL aquí)
+  /* ======================
+     CONFIG (EDITA SOLO ESTO)
+     ====================== */
+  const API_BASE = "https://chesttop-api.fam-premium2720.workers.dev";
+  const CATALOG_URL = "https://www.chesttop.com/";
+  const LIMIT_MAX = 5;
 
-  const LIMIT_MAX = 5; // solo para texto; el backend devuelve remaining real.
+  // Logo opcional (si no quieres, déjalo vacío)
+  const LOGO_URL = "";
 
-  document.getElementById("backCatalog").href = CATALOG_URL;
+  // Plataformas (dropdown Mis cuentas)
+  const PLATFORMS = [
+    "NETFLIX","DISNEY","MAX","MAXPLATINO","PRIME","VIX","CRUNCHY","CHATGPT",
+    "PARAMOUNT","DEEZER","CAPCUT","VIKI","FLUJOTV"
+  ];
+
+  // Mensaje aprobado para “Actualizar hogar”
+  const UPDATE_HOME_MESSAGE =
+`🏠 Actualizar hogar (Netflix)
+Este caso no se resuelve con código automático.
+
+⚡ Requiere cambio de cuenta (solución inmediata).
+📲 Contáctanos por WhatsApp para proceder con ello.
+
+✅ Tip: Si te salen las opciones “Estoy de viaje” o “Ver temporalmente”, ahí sí podemos generarte el enlace/código desde el portal.`;
+
+  document.getElementById("btnCatalog").addEventListener("click", () => {
+    window.open(CATALOG_URL, "_self");
+  });
+
   const logoImg = document.getElementById("logoImg");
   if (LOGO_URL) logoImg.src = LOGO_URL; else logoImg.style.display = "none";
 
@@ -437,9 +476,8 @@
   }
 
   async function copyText(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch (e) {
+    try { await navigator.clipboard.writeText(text); }
+    catch {
       const ta = document.createElement("textarea");
       ta.value = text;
       document.body.appendChild(ta);
@@ -476,7 +514,7 @@
     }
 
     return `
-      <div class="resultTitle ${cls}">${icon} ${esc("Tu código de acceso temporal de Netflix")}</div>
+      <div class="resultTitle ${cls}">${icon} Tu código de acceso temporal de Netflix</div>
       ${time ? `<div class="line">🕒 <span class="label2">Hora:</span> <b>${time} (PET)</b></div>` : ``}
       <div class="line">📌 <span class="label2">Estado:</span> <b>${status}</b></div>
       ${linkBlock}
@@ -509,7 +547,7 @@
     }
 
     return `
-      <div class="resultTitle ${cls}">${icon} ${esc("Tu código de acceso único para Disney+")}</div>
+      <div class="resultTitle ${cls}">${icon} Tu código de acceso único para Disney+</div>
       ${time ? `<div class="line">🕒 <span class="label2">Hora:</span> <b>${time} (PET)</b></div>` : ``}
       <div class="line">📌 <span class="label2">Estado:</span> <b>${status}</b></div>
       ${codeBlock}
@@ -541,33 +579,24 @@
     outHTML("outNetflix", "");
     setLoader("loaderNetflix", true);
 
-    // ✅ Opción 2: “Actualizar hogar” = 100% simulación front (no backend)
     if (opcion === "Actualizar hogar") {
       setTimeout(() => {
         setLoader("loaderNetflix", false);
         outHTML("outNetflix", `
-          <div class="resultTitle yellowTitle">🏠 Actualizar hogar (Netflix)</div>
+          <div class="resultTitle yellowTitle">🏠 Actualizar hogar</div>
           <div style="color:rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
-            ✅ Tip: Si te salen las opciones “Estoy de viaje” o “Ver temporalmente”, ahí sí podemos generarte el enlace/código desde el portal.
-          </div>
-          <div style="margin-top:10px; color:rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
-            Este caso no se resuelve con código automático.\n\n⚡ Requiere cambio de cuenta (solución inmediata).\n📲 Contáctanos por WhatsApp para proceder con ello.
+            ${esc(UPDATE_HOME_MESSAGE)}
           </div>
         `);
       }, 1200);
       return;
     }
 
-    // Backend solo para “Estoy de viaje” / “Ver temporalmente”
     try{
       const res = await fetch(`${API_BASE}/api/portal/netflix`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          deviceId: getDeviceId(),
-          phone,
-          pin
-        })
+        body: JSON.stringify({ deviceId: getDeviceId(), phone, pin })
       });
       const data = await res.json();
 
@@ -578,7 +607,6 @@
         outHTML("outNetflix", renderNetflix(data));
         return;
       }
-
       outHTML("outNetflix", renderError("No se pudo completar", data.message || "Intenta nuevamente."));
     }catch(e){
       setLoader("loaderNetflix", false);
@@ -602,12 +630,7 @@
       const res = await fetch(`${API_BASE}/api/portal/disney`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          deviceId: getDeviceId(),
-          phone,
-          pin,
-          motivo
-        })
+        body: JSON.stringify({ deviceId: getDeviceId(), phone, pin, motivo })
       });
       const data = await res.json();
 
@@ -618,7 +641,6 @@
         outHTML("outDisney", renderDisney(data));
         return;
       }
-
       outHTML("outDisney", renderError("No se pudo completar", data.message || "Intenta nuevamente."));
     }catch(e){
       setLoader("loaderDisney", false);
@@ -638,11 +660,7 @@
       const res = await fetch(`${API_BASE}/api/portal/account`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          deviceId: getDeviceId(),
-          phone,
-          platform
-        })
+        body: JSON.stringify({ deviceId: getDeviceId(), phone, platform })
       });
       const data = await res.json();
 
@@ -653,7 +671,6 @@
         outHTML("outAccount", renderAccount(data));
         return;
       }
-
       outHTML("outAccount", renderError("No se encontró información", data.message || "Verifica los datos."));
     }catch(e){
       setLoader("loaderAccount", false);
@@ -661,9 +678,8 @@
     }
   }
 
-  // init platforms
   (function init(){
-    const PLATFORMS = ["NETFLIX","DISNEY","MAX","MAXPLATINO","PRIME","VIX","CRUNCHY","CHATGPT","PARAMOUNT","DEEZER","CAPCUT","VIKI","FLUJOTV"];
+    // fill platforms
     const sel = document.getElementById("platform");
     sel.innerHTML = "";
     PLATFORMS.forEach(p => {
@@ -673,9 +689,14 @@
       sel.appendChild(o);
     });
 
+    // init remain chips
     setRemain("remainNetflix", null);
     setRemain("remainDisney", null);
     setRemain("remainAccount", null);
+
+    // Optional: Enter triggers search (Netflix/Disney)
+    document.getElementById("pinNetflix").addEventListener("keydown", (e)=>{ if(e.key==="Enter") runNetflix(); });
+    document.getElementById("pinDisney").addEventListener("keydown", (e)=>{ if(e.key==="Enter") runDisney(); });
   })();
 </script>
 </body>
