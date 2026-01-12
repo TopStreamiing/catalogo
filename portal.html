@@ -21,6 +21,7 @@
       --chip:rgba(255,255,255,.08);
       --shadow:0 18px 55px rgba(0,0,0,.45);
       --radius:18px;
+      --danger:#ff7a7a;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
@@ -35,7 +36,6 @@
     }
 
     .wrap{ max-width: 860px; margin: 0 auto; padding: 26px 16px 44px; }
-
     .header{ display:flex; gap:14px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
 
     .logo{
@@ -131,8 +131,21 @@
       font-size: 14px;
       outline:none;
     }
-
     input::placeholder{ color: rgba(234,240,255,.45); }
+
+    /* Validación visual */
+    .fieldWrap{ display:flex; flex-direction:column; gap:6px; }
+    .field-error{
+      border-color: rgba(255,122,122,.65) !important;
+      box-shadow: 0 0 0 3px rgba(255,122,122,.12);
+    }
+    .err{
+      min-height: 16px;
+      font-size: 12px;
+      color: rgba(255,122,122,.92);
+      font-weight: 800;
+      line-height: 1.25;
+    }
 
     .actions{
       display:flex;
@@ -274,29 +287,33 @@
       <!-- PANEL NETFLIX -->
       <div id="panelNetflix">
         <div class="grid three">
-          <div>
+          <div class="fieldWrap">
             <label>Número de celular</label>
             <input id="phoneNetflix" inputmode="tel" placeholder="+51 904 293 916">
+            <div class="err" id="errPhoneNetflix"></div>
           </div>
 
-          <div>
+          <div class="fieldWrap">
             <label>PIN (4 dígitos)</label>
             <input id="pinNetflix" inputmode="numeric" maxlength="4" placeholder="1234">
+            <div class="err" id="errPinNetflix"></div>
           </div>
 
-          <div>
+          <div class="fieldWrap">
             <label>¿Qué opción te sale?</label>
             <select id="opcionNetflix">
-              <option value="Estoy de viaje">Estoy de viaje</option>
-              <option value="Ver temporalmente">Ver temporalmente</option>
-              <option value="Actualizar hogar">Actualizar hogar</option>
+              <option value="" selected disabled>Seleccionar opción…</option>
+              <option value="viaje">Estoy de viaje</option>
+              <option value="temporal">Ver temporalmente</option>
+              <option value="hogar">Actualizar hogar</option>
             </select>
+            <div class="err" id="errOptNetflix"></div>
           </div>
         </div>
 
         <div class="actions">
-          <button id="btnSearchNetflix" class="btn primary" onclick="searchNetflix()">Buscar código</button>
-          <button id="btnRetryNetflix" class="btn ghost" onclick="retryNetflix()">Reintentar</button>
+          <button id="btnSearchNetflix" class="btn primary" onclick="searchNetflix()" disabled>Buscar código</button>
+          <button id="btnRetryNetflix" class="btn ghost" onclick="retryNetflix()" disabled>Reintentar</button>
           <span id="remainNetflix" class="chip">Te quedan — de 2</span>
         </div>
 
@@ -312,29 +329,33 @@
       <!-- PANEL DISNEY -->
       <div id="panelDisney" class="hidden">
         <div class="grid three">
-          <div>
+          <div class="fieldWrap">
             <label>Número de celular</label>
             <input id="phoneDisney" inputmode="tel" placeholder="+51 904 293 916">
+            <div class="err" id="errPhoneDisney"></div>
           </div>
 
-          <div>
+          <div class="fieldWrap">
             <label>PIN del perfil (4 dígitos)</label>
             <input id="pinDisney" inputmode="numeric" maxlength="4" placeholder="1234">
+            <div class="err" id="errPinDisney"></div>
           </div>
 
-          <div>
+          <div class="fieldWrap">
             <label>Motivo</label>
             <select id="motivoDisney">
+              <option value="" selected disabled>Seleccionar motivo…</option>
               <option value="Iniciar sesión (Celular/PC)">Iniciar sesión (Celular/PC)</option>
               <option value="Activar TV">Activar TV</option>
               <option value="Estoy fuera de casa">Estoy fuera de casa</option>
             </select>
+            <div class="err" id="errMotivoDisney"></div>
           </div>
         </div>
 
         <div class="actions">
-          <button id="btnSearchDisney" class="btn primary" onclick="searchDisney()">Buscar código</button>
-          <button id="btnRetryDisney" class="btn ghost" onclick="retryDisney()">Reintentar</button>
+          <button id="btnSearchDisney" class="btn primary" onclick="searchDisney()" disabled>Buscar código</button>
+          <button id="btnRetryDisney" class="btn ghost" onclick="retryDisney()" disabled>Reintentar</button>
           <span id="remainDisney" class="chip">Te quedan — de 2</span>
         </div>
 
@@ -350,19 +371,21 @@
       <!-- PANEL CUENTAS -->
       <div id="panelAccounts" class="hidden">
         <div class="grid two">
-          <div>
+          <div class="fieldWrap">
             <label>Número de celular</label>
             <input id="phoneAccount" inputmode="tel" placeholder="+51 904 293 916">
+            <div class="err" id="errPhoneAccount"></div>
           </div>
 
-          <div>
+          <div class="fieldWrap">
             <label>Plataforma</label>
             <select id="platform"></select>
+            <div class="err" id="errPlatform"></div>
           </div>
         </div>
 
         <div class="actions">
-          <button id="btnAccount" class="btn primary" onclick="checkAccount()">🧾 Revisar mi cuenta</button>
+          <button id="btnAccount" class="btn primary" onclick="checkAccount()" disabled>🧾 Revisar mi cuenta</button>
           <span id="remainAccount" class="chip">Te quedan — de 2</span>
         </div>
 
@@ -390,7 +413,6 @@
     "PARAMOUNT","DEEZER","CAPCUT","VIKI","FLUJOTV"
   ];
 
-  // Mensaje aprobado para “Actualizar hogar”
   const UPDATE_HOME_MESSAGE =
 `🏠 Actualizar hogar (Netflix)
 Este caso no se resuelve con código automático.
@@ -400,7 +422,6 @@ Este caso no se resuelve con código automático.
 
 ✅ Tip: Si te salen las opciones “Estoy de viaje” o “Ver temporalmente”, ahí sí podemos generarte el enlace/código desde el portal.`;
 
-  // Netflix "no_email" copy aprobado
   const NETFLIX_NO_EMAIL_COPY =
 `⏳ Espera 60 segundos y presiona Reintentar.
 📌 NO dar clic en "Reenviar email".
@@ -421,7 +442,6 @@ Si aún no llega el código, contacta soporte por WhatsApp.`;
       .replaceAll('"',"&quot;")
       .replaceAll("'","&#039;");
   }
-
   function outHTML(elId, html){ document.getElementById(elId).innerHTML = html || ""; }
 
   function getDeviceId(){
@@ -434,28 +454,22 @@ Si aún no llega el código, contacta soporte por WhatsApp.`;
     return id;
   }
 
-  // Mask email: 2 first + *** + last + @domain
   function maskEmail(email){
     const e = String(email || "").trim();
     const at = e.lastIndexOf("@");
     if(at < 0) return e;
     const user = e.slice(0, at);
     const dom = e.slice(at);
-
     if(user.length === 0) return "***" + dom;
     if(user.length === 1) return user[0] + "***" + dom;
     if(user.length === 2) return user.slice(0,2) + "***" + dom;
-
-    const first2 = user.slice(0,2);
-    const last1 = user.slice(-1);
-    return `${first2}***${last1}${dom}`;
+    return `${user.slice(0,2)}***${user.slice(-1)}${dom}`;
   }
 
   function switchTab(which){
     const tabN = document.getElementById("tabNetflix");
     const tabD = document.getElementById("tabDisney");
     const tabA = document.getElementById("tabAccounts");
-
     const panN = document.getElementById("panelNetflix");
     const panD = document.getElementById("panelDisney");
     const panA = document.getElementById("panelAccounts");
@@ -463,7 +477,6 @@ Si aún no llega el código, contacta soporte por WhatsApp.`;
     tabN.classList.remove("active");
     tabD.classList.remove("active");
     tabA.classList.remove("active");
-
     panN.classList.add("hidden");
     panD.classList.add("hidden");
     panA.classList.add("hidden");
@@ -492,57 +505,52 @@ Si aún no llega el código, contacta soporte por WhatsApp.`;
     `;
   }
 
+  /* ===== Toast Copiado ===== */
   let toastTimer = null;
-
-function showToast(msg){
-  clearTimeout(toastTimer);
-
-  let t = document.getElementById("toastBox");
-  if(!t){
-    t = document.createElement("div");
-    t.id = "toastBox";
-    t.style.position = "fixed";
-    t.style.left = "50%";
-    t.style.bottom = "22px";
-    t.style.transform = "translateX(-50%)";
-    t.style.background = "rgba(10,10,20,.88)";
-    t.style.color = "#fff";
-    t.style.padding = "10px 14px";
-    t.style.borderRadius = "999px";
-    t.style.border = "1px solid rgba(255,255,255,.15)";
-    t.style.fontWeight = "900";
-    t.style.fontSize = "13px";
-    t.style.zIndex = "9999";
-    t.style.display = "none";
-    document.body.appendChild(t);
+  function showToast(msg){
+    clearTimeout(toastTimer);
+    let t = document.getElementById("toastBox");
+    if(!t){
+      t = document.createElement("div");
+      t.id = "toastBox";
+      t.style.position = "fixed";
+      t.style.left = "50%";
+      t.style.bottom = "22px";
+      t.style.transform = "translateX(-50%)";
+      t.style.background = "rgba(10,10,20,.88)";
+      t.style.color = "#fff";
+      t.style.padding = "10px 14px";
+      t.style.borderRadius = "999px";
+      t.style.border = "1px solid rgba(255,255,255,.15)";
+      t.style.fontWeight = "900";
+      t.style.fontSize = "13px";
+      t.style.zIndex = "9999";
+      t.style.display = "none";
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.display = "block";
+    toastTimer = setTimeout(() => t.style.display = "none", 1400);
   }
 
-  t.textContent = msg;
-  t.style.display = "block";
-
-  toastTimer = setTimeout(() => {
-    t.style.display = "none";
-  }, 1400);
-}
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast("✅ Copiado");
-  } catch (e) {
-    // Fallback para navegadores que bloquean clipboard
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    ta.remove();
-    showToast("✅ Copiado");
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("✅ Copiado");
+    } catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      showToast("✅ Copiado");
+    }
   }
-}
 
+  /* ===== Cooldown (con protección vs validación) ===== */
+  const cooldownUntil = { netflix: 0, disney: 0, account: 0 };
 
-  /* ======= COOLDOWN ======= */
   function setButtonsDisabled(ids, disabled){
     ids.forEach(id => {
       const el = document.getElementById(id);
@@ -550,18 +558,21 @@ async function copyText(text) {
     });
   }
 
-  function startCooldown(buttonIds, seconds, retryIdToLabel){
-    const until = Date.now() + seconds * 1000;
+  function startCooldown(sectionKey, buttonIds, seconds, retryIdToLabel){
+    cooldownUntil[sectionKey] = Date.now() + seconds * 1000;
+
     setButtonsDisabled(buttonIds, true);
 
     const retryBtn = retryIdToLabel ? document.getElementById(retryIdToLabel) : null;
     const originalRetryText = retryBtn ? retryBtn.textContent : "";
 
     const tick = () => {
-      const left = until - Date.now();
+      const left = cooldownUntil[sectionKey] - Date.now();
       if(left <= 0){
-        setButtonsDisabled(buttonIds, false);
+        cooldownUntil[sectionKey] = 0;
         if(retryBtn) retryBtn.textContent = originalRetryText || "Reintentar";
+        // al terminar, revalida para habilitar correctamente
+        validateAll();
         return;
       }
       if(retryBtn) retryBtn.textContent = `Reintentar (${Math.ceil(left/1000)}s)`;
@@ -570,6 +581,105 @@ async function copyText(text) {
     tick();
   }
 
+  /* ===== Validación UI ===== */
+  function setFieldError(idField, idErr, msg){
+    const el = document.getElementById(idField);
+    const err = document.getElementById(idErr);
+    if(!el || !err) return;
+
+    if(msg){
+      el.classList.add("field-error");
+      err.textContent = msg;
+    }else{
+      el.classList.remove("field-error");
+      err.textContent = "";
+    }
+  }
+
+  function isTouched(id){
+    const el = document.getElementById(id);
+    return el && el.dataset.touched === "1";
+  }
+  function markTouched(id){
+    const el = document.getElementById(id);
+    if(el) el.dataset.touched = "1";
+  }
+
+  function validPin4(pin){ return /^\d{4}$/.test(String(pin||"").trim()); }
+
+  function validateNetflix(){
+    const phone = document.getElementById("phoneNetflix").value.trim();
+    const pin = document.getElementById("pinNetflix").value.trim();
+    const opt = document.getElementById("opcionNetflix").value;
+
+    const okPhone = phone !== "";
+    const okPin = validPin4(pin);
+    const okOpt = opt !== "";
+
+    // errores solo si ya tocaron el campo (no apenas carga)
+    if(isTouched("phoneNetflix")) setFieldError("phoneNetflix","errPhoneNetflix", okPhone ? "" : "⚠️ Ingresa tu número de celular");
+    if(isTouched("pinNetflix")) setFieldError("pinNetflix","errPinNetflix", okPin ? "" : "⚠️ El PIN debe tener 4 dígitos");
+    if(isTouched("opcionNetflix")) setFieldError("opcionNetflix","errOptNetflix", okOpt ? "" : "⚠️ Debes seleccionar una opción");
+
+    const cooldown = Date.now() < cooldownUntil.netflix;
+    const enable = okPhone && okPin && okOpt && !cooldown;
+
+    document.getElementById("btnSearchNetflix").disabled = !enable;
+    document.getElementById("btnRetryNetflix").disabled = !enable;
+  }
+
+  function validateDisney(){
+    const phone = document.getElementById("phoneDisney").value.trim();
+    const pin = document.getElementById("pinDisney").value.trim();
+    const motivo = document.getElementById("motivoDisney").value;
+
+    const okPhone = phone !== "";
+    const okPin = validPin4(pin);
+    const okMotivo = motivo !== "";
+
+    if(isTouched("phoneDisney")) setFieldError("phoneDisney","errPhoneDisney", okPhone ? "" : "⚠️ Ingresa tu número de celular");
+    if(isTouched("pinDisney")) setFieldError("pinDisney","errPinDisney", okPin ? "" : "⚠️ El PIN debe tener 4 dígitos");
+    if(isTouched("motivoDisney")) setFieldError("motivoDisney","errMotivoDisney", okMotivo ? "" : "⚠️ Selecciona un motivo");
+
+    const cooldown = Date.now() < cooldownUntil.disney;
+    const enable = okPhone && okPin && okMotivo && !cooldown;
+
+    document.getElementById("btnSearchDisney").disabled = !enable;
+    document.getElementById("btnRetryDisney").disabled = !enable;
+  }
+
+  function validateAccount(){
+    const phone = document.getElementById("phoneAccount").value.trim();
+    const plat = document.getElementById("platform").value;
+
+    const okPhone = phone !== "";
+    const okPlat = plat !== "";
+
+    if(isTouched("phoneAccount")) setFieldError("phoneAccount","errPhoneAccount", okPhone ? "" : "⚠️ Ingresa tu número de celular");
+    if(isTouched("platform")) setFieldError("platform","errPlatform", okPlat ? "" : "⚠️ Selecciona una plataforma");
+
+    const cooldown = Date.now() < cooldownUntil.account;
+    const enable = okPhone && okPlat && !cooldown;
+
+    document.getElementById("btnAccount").disabled = !enable;
+  }
+
+  function validateAll(){
+    validateNetflix();
+    validateDisney();
+    validateAccount();
+  }
+
+  // marcar touched cuando interactúa
+  function wireTouched(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input", () => { markTouched(id); validateAll(); });
+    el.addEventListener("change", () => { markTouched(id); validateAll(); });
+    el.addEventListener("blur", () => { markTouched(id); validateAll(); });
+  }
+
+  /* ===== Renderers ===== */
   function renderNetflix(res){
     const emailMasked = esc(maskEmail(res.email || ""));
     const time = esc(res.timeText || "");
@@ -715,18 +825,22 @@ async function copyText(text) {
   function retryNetflix(){ runNetflix(); }
 
   async function runNetflix(){
-    // 🔒 Cooldown 30s: Buscar + Reintentar
-    startCooldown(["btnSearchNetflix","btnRetryNetflix"], 30, "btnRetryNetflix");
+    // Marca touched para mostrar errores si intentan apretar
+    ["phoneNetflix","pinNetflix","opcionNetflix"].forEach(markTouched);
+    validateNetflix();
+    if (document.getElementById("btnSearchNetflix").disabled) return;
 
-    const phone = (document.getElementById("phoneNetflix").value || "").trim();
-    const pin = (document.getElementById("pinNetflix").value || "").trim();
+    startCooldown("netflix", ["btnSearchNetflix","btnRetryNetflix"], 30, "btnRetryNetflix");
+
+    const phone = document.getElementById("phoneNetflix").value.trim();
+    const pin = document.getElementById("pinNetflix").value.trim();
     const opcion = document.getElementById("opcionNetflix").value;
 
     outHTML("outNetflix", "");
     setLoader("loaderNetflix", true);
 
-    // Simulación front para Actualizar hogar (no API, no consume intentos)
-    if (opcion === "Actualizar hogar") {
+    // Simulación front para Actualizar hogar
+    if (opcion === "hogar") {
       setTimeout(() => {
         setLoader("loaderNetflix", false);
         outHTML("outNetflix", renderSimpleWarn("🏠 Actualizar hogar (Netflix)", UPDATE_HOME_MESSAGE));
@@ -750,7 +864,6 @@ async function copyText(text) {
         return;
       }
 
-      // Si el backend manda “no_email” lo renderizamos con copy definido
       if(data && data.kind === "no_email"){
         outHTML("outNetflix", renderNetflix({ kind:"no_email", email: data.email || "" }));
         return;
@@ -768,11 +881,14 @@ async function copyText(text) {
   function retryDisney(){ runDisney(); }
 
   async function runDisney(){
-    // 🔒 Cooldown 30s: Buscar + Reintentar
-    startCooldown(["btnSearchDisney","btnRetryDisney"], 30, "btnRetryDisney");
+    ["phoneDisney","pinDisney","motivoDisney"].forEach(markTouched);
+    validateDisney();
+    if (document.getElementById("btnSearchDisney").disabled) return;
 
-    const phone = (document.getElementById("phoneDisney").value || "").trim();
-    const pin = (document.getElementById("pinDisney").value || "").trim();
+    startCooldown("disney", ["btnSearchDisney","btnRetryDisney"], 30, "btnRetryDisney");
+
+    const phone = document.getElementById("phoneDisney").value.trim();
+    const pin = document.getElementById("pinDisney").value.trim();
     const motivo = document.getElementById("motivoDisney").value;
 
     outHTML("outDisney", "");
@@ -808,10 +924,13 @@ async function copyText(text) {
 
   // ---------- ACCOUNT ----------
   async function checkAccount(){
-    // 🔒 Cooldown 10s
-    startCooldown(["btnAccount"], 10, null);
+    ["phoneAccount","platform"].forEach(markTouched);
+    validateAccount();
+    if (document.getElementById("btnAccount").disabled) return;
 
-    const phone = (document.getElementById("phoneAccount").value || "").trim();
+    startCooldown("account", ["btnAccount"], 10, null);
+
+    const phone = document.getElementById("phoneAccount").value.trim();
     const platform = document.getElementById("platform").value;
 
     outHTML("outAccount", "");
@@ -841,8 +960,17 @@ async function copyText(text) {
   }
 
   (function init(){
+    // Platform select placeholder + options
     const sel = document.getElementById("platform");
     sel.innerHTML = "";
+
+    const ph = document.createElement("option");
+    ph.value = "";
+    ph.textContent = "Seleccionar plataforma…";
+    ph.disabled = true;
+    ph.selected = true;
+    sel.appendChild(ph);
+
     PLATFORMS.forEach(p => {
       const o = document.createElement("option");
       o.value = p;
@@ -853,6 +981,16 @@ async function copyText(text) {
     setRemain("remainNetflix", null);
     setRemain("remainDisney", null);
     setRemain("remainAccount", null);
+
+    // Wire touched + validation realtime
+    [
+      "phoneNetflix","pinNetflix","opcionNetflix",
+      "phoneDisney","pinDisney","motivoDisney",
+      "phoneAccount","platform"
+    ].forEach(wireTouched);
+
+    // Estado inicial (botones deshabilitados)
+    validateAll();
   })();
 </script>
 </body>
