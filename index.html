@@ -508,10 +508,17 @@
       return v ? `S/ ${escapeHtml(v)}` : "Consultar";
     }
 
-    function buildCardHTML(x, i){
-      const img = x.imagen
-        ? `<img src="${escapeHtml(x.imagen)}" alt="${escapeHtml(x.nombre)}" loading="lazy">`
-        : `<div class="status">Sin imagen</div>`;
+function buildCardHTML(x, i){
+  const img = x.imagen
+    ? `<img
+         src="${escapeHtml(x.imagen).replace(/sz=w\d+/,'sz=w400')}"
+         alt="${escapeHtml(x.nombre)}"
+         loading="lazy"
+         decoding="async"
+         fetchpriority="low"
+       >`
+    : `<div class="status">Sin imagen</div>`;
+
 
       return `
         <div class="card">
@@ -593,9 +600,15 @@
       $("dtStock").innerHTML = stockBadge(seleccionado.stock);
       $("dtDesc").textContent = seleccionado.descripcion || "—";
 
-      $("dtImgWrap").innerHTML = seleccionado.imagen
-        ? `<img src="${escapeHtml(seleccionado.imagen)}" alt="${escapeHtml(seleccionado.nombre)}">`
-        : `<div class="status" style="padding:14px">Sin imagen</div>`;
+$("dtImgWrap").innerHTML = seleccionado.imagen
+  ? `<img
+       src="${escapeHtml(seleccionado.imagen).replace(/sz=w\d+/,'sz=w1200')}"
+       alt="${escapeHtml(seleccionado.nombre)}"
+       decoding="async"
+       fetchpriority="high"
+     >`
+  : `<div class="status" style="padding:14px">Sin imagen</div>`;
+
 
       const n = toNumberStock(seleccionado.stock);
       $("zonaAgotado").style.display = (n <= 0) ? "block" : "none";
