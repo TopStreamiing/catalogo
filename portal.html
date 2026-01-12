@@ -490,17 +490,55 @@ Si aún no llega el código, contacta soporte por WhatsApp.`;
     `;
   }
 
-  async function copyText(text) {
-    try { await navigator.clipboard.writeText(text); }
-    catch {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      ta.remove();
-    }
+  let toastTimer = null;
+
+function showToast(msg){
+  clearTimeout(toastTimer);
+
+  let t = document.getElementById("toastBox");
+  if(!t){
+    t = document.createElement("div");
+    t.id = "toastBox";
+    t.style.position = "fixed";
+    t.style.left = "50%";
+    t.style.bottom = "22px";
+    t.style.transform = "translateX(-50%)";
+    t.style.background = "rgba(10,10,20,.88)";
+    t.style.color = "#fff";
+    t.style.padding = "10px 14px";
+    t.style.borderRadius = "999px";
+    t.style.border = "1px solid rgba(255,255,255,.15)";
+    t.style.fontWeight = "900";
+    t.style.fontSize = "13px";
+    t.style.zIndex = "9999";
+    t.style.display = "none";
+    document.body.appendChild(t);
   }
+
+  t.textContent = msg;
+  t.style.display = "block";
+
+  toastTimer = setTimeout(() => {
+    t.style.display = "none";
+  }, 1400);
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("✅ Copiado");
+  } catch (e) {
+    // Fallback para navegadores que bloquean clipboard
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    showToast("✅ Copiado");
+  }
+}
+
 
   /* ======= COOLDOWN ======= */
   function setButtonsDisabled(ids, disabled){
