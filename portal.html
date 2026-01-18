@@ -799,17 +799,52 @@ Si aún no llega el código, contacta soporte por WhatsApp.`;
   }
 
   function renderAccount(res){
-    return `
-      <div class="resultTitle greenTitle">🧾 Revisión de cuenta</div>
-      <div class="line">📌 <span class="label2">Plataforma:</span> <b>${esc(res.platform || "")}</b></div>
-      <div class="line">📧 <span class="label2">Correo:</span> <b>${esc(res.email || "")}</b></div>
-      <div class="line">🔑 <span class="label2">Contraseña:</span> <b>${esc(res.password || "")}</b></div>
+  const isMaintenance = res.maintenance === true;
+
+  const supportMsg =
+`Hola 👋
+Me aparece que mi cuenta está en *mantenimiento* y necesita soporte inmediato.
+📌 Plataforma: ${res.platform || ""}
+📧 Correo: ${res.email || ""}`;
+
+  const maintenanceBlock = isMaintenance ? `
+    <div style="
+      margin-top:14px;
+      padding:12px;
+      border-radius:12px;
+      background: rgba(255, 211, 110, 0.15);
+      border: 1px solid rgba(255, 211, 110, 0.45);
+      color:#FFD36E;
+      font-size:13px;
+      line-height:1.35;
+    ">
+      ⚠️ <b>Cuenta en mantenimiento</b><br>
+      Esta cuenta requiere soporte inmediato para restablecer el acceso.
+
       <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn ghost" onclick="copyText('${esc(res.password || "")}')">Copiar contraseña</button>
-        <button class="btn ghost" onclick="copyText('${esc(res.email || "")}')">Copiar correo</button>
+        <button class="btn ghost" onclick="copyText(\`${supportMsg}\`)">
+          📋 Copiar mensaje para soporte
+        </button>
       </div>
-    `;
-  }
+    </div>
+  ` : "";
+
+  return `
+    <div class="resultTitle greenTitle">🧾 Revisión de cuenta</div>
+
+    <div class="line">📌 <span class="label2">Plataforma:</span> <b>${esc(res.platform || "")}</b></div>
+    <div class="line">📧 <span class="label2">Correo:</span> <b>${esc(res.email || "")}</b></div>
+    <div class="line">🔑 <span class="label2">Contraseña:</span> <b>${esc(res.password || "")}</b></div>
+
+    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn ghost" onclick="copyText('${esc(res.password || "")}')">Copiar contraseña</button>
+      <button class="btn ghost" onclick="copyText('${esc(res.email || "")}')">Copiar correo</button>
+    </div>
+
+    ${maintenanceBlock}
+  `;
+}
+
 
   function renderSimpleWarn(title, msg){
     return `
