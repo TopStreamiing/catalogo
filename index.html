@@ -565,6 +565,74 @@
 }
 .btn-movie:hover{ border-color: rgba(56,189,248,.70); }
 
+    /* =========================
+   BOTTOM NAV SOLO MÓVIL
+========================= */
+.bottomNav{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  display: none;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(5,8,18,.96);
+  border-top: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 -10px 30px rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+}
+
+.bottomNav-item{
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(226,232,240,.82);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:8px 4px;
+  min-height:58px;
+  cursor:pointer;
+  border-radius:14px;
+  transition: background .15s ease, color .15s ease, transform .08s ease;
+}
+
+.bottomNav-item:active{
+  transform: translateY(1px);
+}
+
+.bottomNav-item.active{
+  color: #22c55e;
+  background: rgba(34,197,94,.08);
+}
+
+.bottomNav-icon{
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bottomNav-label{
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: .1px;
+}
+
+/* Solo celular */
+@media (max-width:720px){
+  .bottomNav{
+    display:grid;
+  }
+
+  body{
+    padding-bottom: 86px;
+  }
+}
+    
 /* PAGINACIÓN SOLO PC */
 .pager{
   margin-top: 22px;
@@ -743,6 +811,31 @@
     </div>
   </div>
 
+
+    <!-- Bottom nav solo móvil -->
+  <nav class="bottomNav" id="bottomNav" aria-label="Navegación móvil">
+    <button class="bottomNav-item active" id="bnProductos" type="button">
+      <span class="bottomNav-icon">🛍️</span>
+      <span class="bottomNav-label">Productos</span>
+    </button>
+
+    <button class="bottomNav-item" id="bnCuentas" type="button">
+      <span class="bottomNav-icon">👤</span>
+      <span class="bottomNav-label">Mis cuentas</span>
+    </button>
+
+    <button class="bottomNav-item" id="bnPeliculas" type="button">
+      <span class="bottomNav-icon">🍿</span>
+      <span class="bottomNav-label">Películas</span>
+    </button>
+
+    <button class="bottomNav-item" id="bnContacto" type="button">
+      <span class="bottomNav-icon">💬</span>
+      <span class="bottomNav-label">Contacto</span>
+    </button>
+  </nav>
+
+  
   <script>
     // ✅ TU WORKER
     const API_BASE = "https://chesttop-api.fam-premium2720.workers.dev";
@@ -2175,8 +2268,30 @@ $("iconNext").addEventListener("click", () => scrollIcons(1));
     });
 
     
+        // Bottom nav móvil
+    $("bnProductos")?.addEventListener("click", () => {
+      const hero = document.querySelector(".hero");
+      if (hero) {
+        hero.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+
+    $("bnCuentas")?.addEventListener("click", () => {
+      window.location.href = "portal.html";
+    });
+
+    $("bnPeliculas")?.addEventListener("click", () => {
+      window.open("https://www.justwatch.com/pe", "_blank", "noopener");
+    });
+
+    $("bnContacto")?.addEventListener("click", () => {
+      window.open("https://wa.link/fzemlu", "_blank", "noopener");
+    });
+
     initUI();
-loadStock();
+    loadStock();
 
   </script>
 </body>
