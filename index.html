@@ -487,6 +487,45 @@
   transition: opacity .55s ease;
 }
 
+.bannerArrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.35);
+  color:#fff;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  opacity:.6;
+  transition:.2s;
+  backdrop-filter: blur(4px);
+}
+
+.bannerArrow:hover{
+  opacity:1;
+  background:rgba(0,0,0,.55);
+}
+
+.bannerArrow.left{
+  left:12px;
+}
+
+.bannerArrow.right{
+  right:12px;
+}
+
+@media (max-width:720px){
+  .bannerArrow{
+    display:none;
+  }
+}
+    
 .banner img.fade-out{
   opacity:0;
 }
@@ -741,7 +780,9 @@
 </div>
 
 <div class="banner" id="bannerBox">
-  <img id="bannerImg" alt="Noticia TopStreaming">
+  <button class="bannerArrow left" id="bannerPrev">❮</button>
+  <img id="bannerImg" alt="Noticia">
+  <button class="bannerArrow right" id="bannerNext">❯</button>
 </div>
 
 <div class="filters">
@@ -1250,6 +1291,33 @@ function changeBannerSmooth(nextSrc){
   }, 260);
 }
 
+function nextBanner(){
+  if (!bannerImages.length) return;
+
+  bannerIndex = (bannerIndex + 1) % bannerImages.length;
+  changeBannerSmooth(bannerImages[bannerIndex]);
+  restartBannerTimer();
+}
+
+function prevBanner(){
+  if (!bannerImages.length) return;
+
+  bannerIndex = (bannerIndex - 1 + bannerImages.length) % bannerImages.length;
+  changeBannerSmooth(bannerImages[bannerIndex]);
+  restartBannerTimer();
+}
+
+function restartBannerTimer(){
+  if (bannerTimer){
+    clearInterval(bannerTimer);
+  }
+
+  bannerTimer = setInterval(() => {
+    bannerIndex = (bannerIndex + 1) % bannerImages.length;
+    changeBannerSmooth(bannerImages[bannerIndex]);
+  }, 20000);
+}
+
 function startBannerRotation(){
   if (bannerTimer) {
     clearInterval(bannerTimer);
@@ -1265,11 +1333,17 @@ function startBannerRotation(){
 
   // Móvil: solo una portada aleatoria
   if (isMobile){
-    const randomIndex = Math.floor(Math.random() * bannerImages.length);
-    bannerIndex = randomIndex;
-    setBanner(bannerImages[bannerIndex]);
-    return;
+  const randomIndex = Math.floor(Math.random() * bannerImages.length);
+  bannerIndex = randomIndex;
+  setBanner(bannerImages[bannerIndex]);
+
+  if (bannerTimer){
+    clearInterval(bannerTimer);
+    bannerTimer = null;
   }
+
+  return;
+}
 
   // PC / tablet: rotación automática
   bannerIndex = 0;
@@ -1280,7 +1354,7 @@ function startBannerRotation(){
   bannerTimer = setInterval(() => {
     bannerIndex = (bannerIndex + 1) % bannerImages.length;
     changeBannerSmooth(bannerImages[bannerIndex]);
-  }, 6000);
+  }, 20000);
 }
 
 async function initBannerSystem(){
@@ -2357,10 +2431,8 @@ $("btnReload").addEventListener("click", () => {
 
 $("iconPrev").addEventListener("click", () => scrollIcons(-1));
 $("iconNext").addEventListener("click", () => scrollIcons(1));
-
-window.addEventListener("resize", () => {
-startBannerRotation();
-});
+$("bannerNext")?.addEventListener("click", nextBanner);
+$("bannerPrev")?.addEventListener("click", prevBanner);
     
 
     $("btnCerrarDetalles").addEventListener("click", closeDetalles);
