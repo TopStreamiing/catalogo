@@ -468,7 +468,7 @@
   box-shadow: 0 0 0 4px rgba(34,197,94,.14), 0 0 30px rgba(56,189,248,.10);
 }
 
-/* Banner noticia */
+/* Banner rotativo */
 .banner{
   margin-top:14px;
   border-radius: 18px;
@@ -476,11 +476,19 @@
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(18,26,38,.35);
   display:none;
+  position: relative;
 }
+
 .banner img{
   width:100%;
   display:block;
   object-fit:cover;
+  opacity:1;
+  transition: opacity .55s ease;
+}
+
+.banner img.fade-out{
+  opacity:0;
 }
 
 /* Filtros iconos */
@@ -854,10 +862,16 @@
     const API_BASE = "https://chesttop-api.fam-premium2720.workers.dev";
 
     let servicios = [];
-    let seleccionado = null;
-    let activeFilter = ""; // filtro por icono (ej. "Netflix")
-    let currentPage = 1;
-    const PAGE_SIZE_PC = 12;
+let seleccionado = null;
+
+let activeFilter = ""; // filtro por icono (ej. "Netflix")
+let currentPage = 1;
+const PAGE_SIZE_PC = 12;
+
+// Banner rotativo
+let bannerTimer = null;
+let bannerImages = [];
+let bannerIndex = 0;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1153,9 +1167,14 @@ function setBanner(url){
   const box = $("bannerBox");
   const img = $("bannerImg");
   const u = String(url || "").trim();
-  if (!u) { box.style.display="none"; return; }
+
+  if (!u){
+    box.style.display = "none";
+    return;
+  }
+
   img.src = u;
-  box.style.display="block";
+  box.style.display = "block";
 }
 
 function renderIcons(icons){
@@ -1192,7 +1211,82 @@ function scrollIcons(dir){
   $("iconRow").scrollBy({ left: dir * 260, behavior: "smooth" });
 }
 
+function preloadImage(src){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(src);
+    img.onerror = () => reject(src);
+    img.src = src;
+  });
+}
 
+async function getExistingBanners(){
+  const results = await Promise.allSettled(
+    BANNER_IMAGES.map(src => preloadImage(src))
+  );
+
+  return results
+    .filter(r => r.status === "fulfilled")
+    .map(r => r.value);
+}
+
+function changeBannerSmooth(nextSrc){
+  const img = $("bannerImg");
+  const box = $("bannerBox");
+  if (!img || !nextSrc) return;
+
+  box.style.display = "block";
+
+  img.classList.add("fade-out");
+
+  setTimeout(() => {
+    img.src = nextSrc;
+    img.onload = () => {
+      img.classList.remove("fade-out");
+    };
+    img.onerror = () => {
+      img.classList.remove("fade-out");
+    };
+  }, 260);
+}
+
+function startBannerRotation(){
+  if (bannerTimer) {
+    clearInterval(bannerTimer);
+    bannerTimer = null;
+  }
+
+  const isMobile = window.matchMedia("(max-width:720px)").matches;
+
+  if (!bannerImages.length){
+    $("bannerBox").style.display = "none";
+    return;
+  }
+
+  // Móvil: solo una portada aleatoria
+  if (isMobile){
+    const randomIndex = Math.floor(Math.random() * bannerImages.length);
+    bannerIndex = randomIndex;
+    setBanner(bannerImages[bannerIndex]);
+    return;
+  }
+
+  // PC / tablet: rotación automática
+  bannerIndex = 0;
+  setBanner(bannerImages[bannerIndex]);
+
+  if (bannerImages.length <= 1) return;
+
+  bannerTimer = setInterval(() => {
+    bannerIndex = (bannerIndex + 1) % bannerImages.length;
+    changeBannerSmooth(bannerImages[bannerIndex]);
+  }, 6000);
+}
+
+async function initBannerSystem(){
+  bannerImages = await getExistingBanners();
+  startBannerRotation();
+}
 
 
 const CATALOGO_LOCAL = [
@@ -2171,11 +2265,12 @@ const ICONOS = [
   { name:"Flujo TV", icon:"assets/icons/flujoTV.webp" },
   { name:"Seguidores", icon:"assets/icons/RRSS.webp" }
 ];
-
-
-
-
-
+const BANNER_IMAGES = [
+  "assets/cards/Portada.jpg",
+  "assets/cards/Portada2.jpg",
+  "assets/cards/Portada3.jpg",
+  "assets/cards/Portada4.jpg"
+];
 
     
     
@@ -2185,7 +2280,6 @@ function initUI(){
   servicios = CATALOGO_LOCAL.map(x => ({ ...x, stock: null })); // stock desconocido al inicio
 
   setLogo("assets/cards/Logo.png");
-  setBanner("assets/cards/Portada.jpg");
   renderIcons(ICONOS);
 
   activeFilter = "";
@@ -2264,6 +2358,10 @@ $("btnReload").addEventListener("click", () => {
 $("iconPrev").addEventListener("click", () => scrollIcons(-1));
 $("iconNext").addEventListener("click", () => scrollIcons(1));
 
+window.addEventListener("resize", () => {
+startBannerRotation();
+});
+    
 
     $("btnCerrarDetalles").addEventListener("click", closeDetalles);
     $("overlayDetalles").addEventListener("click", (e) => {
@@ -2281,7 +2379,7 @@ $("iconNext").addEventListener("click", () => scrollIcons(1));
     });
 
     
-        // Bottom nav móvil
+            // Bottom nav móvil
     $("bnProductos")?.addEventListener("click", () => {
       const hero = document.querySelector(".hero");
       if (hero) {
@@ -2304,6 +2402,7 @@ $("iconNext").addEventListener("click", () => scrollIcons(1));
     });
 
     initUI();
+    initBannerSystem();
     loadStock();
 
   </script>
