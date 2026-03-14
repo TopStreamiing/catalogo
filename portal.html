@@ -631,8 +631,7 @@
 /* =========================
    CONFIG
 ========================= */
-const API_BASE = "TU_WEBAPP_O_WORKER_URL";   // ejemplo: https://script.google.com/macros/s/.../exec
-const API_TOKEN = "CK.....6";                // si usas Worker, mejor que el Worker lo inyecte
+const API_BASE = "https://chesttop-api.fam-premium2720.workers.dev/api/portal";   // ejemplo: https://script.google.com/macros/s/.../exec
 const WHATSAPP_NUMBER = "51904293916";
 const LOGO_URL = "assets/cards/Logo.png";
 
@@ -701,11 +700,10 @@ function setLogo(){
 }
 
 function apiPost(action, payload = {}) {
-  return fetch(`${API_BASE}?action=${encodeURIComponent(action)}`, {
+  return fetch(`${API_BASE}/${encodeURIComponent(action)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      token: API_TOKEN,
       deviceId: getDeviceId(),
       ...payload
     })
