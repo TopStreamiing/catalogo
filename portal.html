@@ -1369,7 +1369,7 @@ document.getElementById("bnContacto")?.addEventListener("click", () => {
   
   (async function init(){
   setLogo();
-  validateLogin();
+  validateLogin(false);
 
   if(state.sessionToken){
     await loadSessionAndAccounts();
