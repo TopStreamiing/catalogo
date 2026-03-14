@@ -1204,11 +1204,15 @@ async function runCodeSearch(isRetry){
   $("#codeResult").innerHTML = "";
 
   const data = await apiPost("code", {
-    sessionToken: state.sessionToken,
-    rowNumber,
-    option: state.activeCodeOption,
-    motivo: state.activeCodeMotivo
-  });
+  sessionToken: state.sessionToken,
+  email: acc.email || "",
+  platformKey: acc.platformKey || "",
+  accountRaw: acc.accountRaw || "",
+  profile: acc.profile || "",
+  option: state.activeCodeOption,
+  motivo: state.activeCodeMotivo
+});
+
 
   $("#codeLoader").classList.remove("show");
 
