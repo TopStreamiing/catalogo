@@ -758,21 +758,24 @@ function iconForPlatform(name){
   return found ? found.icon : "assets/icons/Default.webp";
 }
 
-function daysClass(daysLeft){
+function daysClass(daysLeft, showDays){
   if(daysLeft === null || daysLeft === undefined || daysLeft === "") return "";
-  if(daysLeft <= 0) return "daysBad";
+  if (!showDays) return "daysOk";
+  if(daysLeft === 0) return "daysWarn";
   if(daysLeft <= 7) return "daysWarn";
   return "daysOk";
 }
 
-function daysText(daysLeft){
-  if(daysLeft === null || daysLeft === undefined || daysLeft === "") return "Sin fecha";
-  if(daysLeft < 0) return "Vencido";
-  if(daysLeft === 0) return "Renueva hoy";
-  if(daysLeft === 1) return "Queda 1 día";
+function daysText(daysLeft, showDays, renewalDate){
+  if (!renewalDate) return "Sin fecha";
+  if (!showDays) {
+    return `Renovación ${renewalDate}`;
+  }
+  if (daysLeft === 0) return "Renueva hoy";
+  if (daysLeft === 1) return "Queda 1 día";
   return `Quedan ${daysLeft} días`;
 }
-
+  
 function amountText(v){
   if (v === "" || v === null || v === undefined) return "—";
   return `S/${Number(v).toFixed(2)}`;
@@ -978,8 +981,8 @@ function renderCards(){
               <div class="metaValue">${esc(amountText(acc.amount))}</div>
             </div>
             <div class="metaBox">
-              <div class="metaLabel">Renovación</div>
-              <div class="metaValue ${daysClass(acc.daysLeft)}">${esc(daysText(acc.daysLeft))}</div>
+            <div class="metaLabel">Renovación</div>
+            <div class="metaValue ${daysClass(acc.daysLeft, acc.showDays)}">${esc(daysText(acc.daysLeft, acc.showDays, acc.renewalDate))}</div>
             </div>
           </div>
 
