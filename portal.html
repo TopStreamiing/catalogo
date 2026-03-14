@@ -477,6 +477,65 @@
       font-size:13px;
     }
     .toast.show{display:block}
+
+    .bottomNav{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  display: none;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(5,8,18,.96);
+  border-top: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 -10px 30px rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+}
+
+.bottomNav-item{
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(226,232,240,.82);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:8px 4px;
+  min-height:58px;
+  cursor:pointer;
+  border-radius:14px;
+  transition: background .15s ease, color .15s ease, transform .08s ease;
+}
+
+.bottomNav-item.active{
+  color: #22c55e;
+  background: rgba(34,197,94,.08);
+}
+
+.bottomNav-icon{
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bottomNav-label{
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+@media (max-width:720px){
+  .bottomNav{
+    display:grid;
+  }
+
+  body{
+    padding-bottom: 86px;
+  }
+}
   </style>
 </head>
 <body>
@@ -545,6 +604,29 @@
 
   <div id="toast" class="toast">✅ Copiado</div>
 
+  
+<nav class="bottomNav" id="bottomNav" aria-label="Navegación móvil">
+  <button class="bottomNav-item" id="bnProductos" type="button">
+    <span class="bottomNav-icon">🛍️</span>
+    <span class="bottomNav-label">Productos</span>
+  </button>
+
+  <button class="bottomNav-item active" id="bnCuentas" type="button">
+    <span class="bottomNav-icon">👤</span>
+    <span class="bottomNav-label">Mis cuentas</span>
+  </button>
+
+  <button class="bottomNav-item" id="bnPeliculas" type="button">
+    <span class="bottomNav-icon">🍿</span>
+    <span class="bottomNav-label">Películas</span>
+  </button>
+
+  <button class="bottomNav-item" id="bnContacto" type="button">
+    <span class="bottomNav-icon">💬</span>
+    <span class="bottomNav-label">Contacto</span>
+  </button>
+</nav>
+  
 <script>
 /* =========================
    CONFIG
@@ -719,24 +801,49 @@ function whatsappLink(message){
 /* =========================
    LOGIN
 ========================= */
-function validateLogin(){
+function validateLogin(showErrors = false){
   const phone = $("#loginPhone").value.trim();
   const pin = $("#loginPin").value.trim();
 
   let ok = true;
 
+  const phoneTouched = $("#loginPhone").dataset.touched === "1";
+  const pinTouched = $("#loginPin").dataset.touched === "1";
+
+  const showPhoneError = showErrors || phoneTouched;
+  const showPinError = showErrors || pinTouched;
+
   if (!phone){
-    $("#errLoginPhone").textContent = "⚠ Ingresa tu número de celular";
-    $("#loginPhone").classList.add("field-error");
+    if (showPhoneError) {
+      $("#errLoginPhone").textContent = "⚠ Ingresa tu número de celular";
+      $("#loginPhone").classList.add("field-error");
+    } else {
+      $("#errLoginPhone").textContent = "";
+      $("#loginPhone").classList.remove("field-error");
+    }
     ok = false;
   } else {
     $("#errLoginPhone").textContent = "";
     $("#loginPhone").classList.remove("field-error");
   }
 
-  if (!/^\d{4,5}$/.test(pin)){
-    $("#errLoginPin").textContent = "⚠ El PIN debe ser numérico de 4 o 5 dígitos";
-    $("#loginPin").classList.add("field-error");
+  if (!pin){
+    if (showPinError) {
+      $("#errLoginPin").textContent = "⚠ Ingresa tu PIN";
+      $("#loginPin").classList.add("field-error");
+    } else {
+      $("#errLoginPin").textContent = "";
+      $("#loginPin").classList.remove("field-error");
+    }
+    ok = false;
+  } else if (!/^\d{4,5}$/.test(pin)){
+    if (showPinError) {
+      $("#errLoginPin").textContent = "⚠ El PIN debe ser numérico de 4 o 5 dígitos";
+      $("#loginPin").classList.add("field-error");
+    } else {
+      $("#errLoginPin").textContent = "";
+      $("#loginPin").classList.remove("field-error");
+    }
     ok = false;
   } else {
     $("#errLoginPin").textContent = "";
@@ -748,27 +855,40 @@ function validateLogin(){
 }
 
 async function doLogin(){
-  if(!validateLogin()) return;
-
   const status = $("#loginStatus");
   status.classList.add("hidden");
   status.innerHTML = "";
 
-  const data = await apiPost("login", {
-    phone: $("#loginPhone").value.trim(),
-    pin: $("#loginPin").value.trim()
-  });
+  if(!validateLogin(true)) return;
 
-  if (!data.ok){
+  const btn = $("#btnLogin");
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Verificando acceso...";
+
+  try {
+    const data = await apiPost("login", {
+      phone: $("#loginPhone").value.trim(),
+      pin: $("#loginPin").value.trim()
+    });
+
+    if (!data.ok){
+      status.classList.remove("hidden");
+      status.innerHTML = `<div class="resultTitle" style="color:#ffb0b0">❌ No se pudo iniciar sesión</div><div>${esc(data.message || "Verifica tu número y PIN.")}</div>`;
+      return;
+    }
+
+    state.sessionToken = data.sessionToken;
+    localStorage.setItem("ts_session_token", data.sessionToken);
+
+    await loadSessionAndAccounts();
+  } catch (e) {
     status.classList.remove("hidden");
-    status.innerHTML = `<div class="resultTitle" style="color:#ffb0b0">❌ No se pudo iniciar sesión</div><div>${esc(data.message || "Verifica tus datos.")}</div>`;
-    return;
+    status.innerHTML = `<div class="resultTitle" style="color:#ffb0b0">❌ Error de conexión</div><div>Intenta nuevamente.</div>`;
+  } finally {
+    btn.textContent = originalText;
+    validateLogin(false);
   }
-
-  state.sessionToken = data.sessionToken;
-  localStorage.setItem("ts_session_token", data.sessionToken);
-
-  await loadSessionAndAccounts();
 }
 
 /* =========================
@@ -1197,17 +1317,52 @@ $("#modalBack").addEventListener("click", (e) => {
    EVENTS
 ========================= */
 $("#btnLogin").addEventListener("click", doLogin);
-$("#loginPhone").addEventListener("input", validateLogin);
+$("#loginPhone").addEventListener("input", () => {
+  $("#loginPhone").dataset.touched = "1";
+  validateLogin(false);
+});
+
+$("#loginPhone").addEventListener("blur", () => {
+  $("#loginPhone").dataset.touched = "1";
+  validateLogin(false);
+});
+
 $("#loginPin").addEventListener("input", () => {
   $("#loginPin").value = $("#loginPin").value.replace(/[^\d]/g, "");
-  validateLogin();
+  $("#loginPin").dataset.touched = "1";
+  validateLogin(false);
+});
+
+$("#loginPin").addEventListener("blur", () => {
+  $("#loginPin").dataset.touched = "1";
+  validateLogin(false);
 });
 $("#btnLogout").addEventListener("click", logout);
 
 /* =========================
    INIT
 ========================= */
-(async function init(){
+document.getElementById("bnProductos")?.addEventListener("click", () => {
+  window.location.href = "index.html";
+});
+
+document.getElementById("bnCuentas")?.addEventListener("click", async () => {
+  if (state.sessionToken) {
+    await loadSessionAndAccounts();
+  } else {
+    showLogin();
+  }
+});
+
+document.getElementById("bnPeliculas")?.addEventListener("click", () => {
+  window.open("https://www.justwatch.com/pe", "_blank", "noopener");
+});
+
+document.getElementById("bnContacto")?.addEventListener("click", () => {
+  window.open("https://wa.link/fzemlu", "_blank", "noopener");
+});
+  
+  (async function init(){
   setLogo();
   validateLogin();
 
