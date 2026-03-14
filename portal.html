@@ -478,6 +478,49 @@
     }
     .toast.show{display:block}
 
+.bootScreen{
+  position:fixed;
+  inset:0;
+  z-index:500;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(900px 520px at 14% 10%, rgba(34,197,94,.20), transparent 60%),
+    radial-gradient(900px 520px at 86% 18%, rgba(56,189,248,.18), transparent 60%),
+    linear-gradient(180deg, #050812, #0b0f17);
+}
+
+.bootInner{
+  text-align:center;
+  padding:24px;
+}
+
+.bootLogo{
+  width:min(110px,28vw);
+  height:auto;
+  object-fit:contain;
+  border-radius:18px;
+  padding:10px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 18px 55px rgba(0,0,0,.45);
+}
+
+.bootTitle{
+  margin-top:16px;
+  font-size:24px;
+  font-weight:1000;
+  color:#e2e8f0;
+}
+
+.bootSub{
+  margin-top:6px;
+  font-size:14px;
+  color:#94a3b8;
+}
+
+    
     .bottomNav{
   position: fixed;
   left: 0;
@@ -540,9 +583,18 @@
 </head>
 <body>
 
+  <section id="bootView" class="bootScreen">
+    <div class="bootInner">
+      <img id="bootLogo" class="bootLogo" alt="Logo">
+      <div class="bootTitle">Cargando tu panel...</div>
+      <div class="bootSub">Verificando tu acceso</div>
+    </div>
+  </section>
+
   <div class="wrap">
+
     <!-- LOGIN -->
-    <section id="loginView">
+    <section id="loginView" class="hidden">
       <div class="brandTop">
         <img id="logoImg" class="brandLogo" alt="Logo">
         <div class="brandTitle">Portal de Clientes</div>
@@ -696,8 +748,14 @@ function esc(s){
 
 function setLogo(){
   const logo = $("#logoImg");
-  if (LOGO_URL) logo.src = LOGO_URL;
+  const bootLogo = $("#bootLogo");
+
+  if (LOGO_URL) {
+    if (logo) logo.src = LOGO_URL;
+    if (bootLogo) bootLogo.src = LOGO_URL;
+  }
 }
+
 
 function apiPost(action, payload = {}) {
   return fetch(`${API_BASE}/${encodeURIComponent(action)}`, {
@@ -929,6 +987,7 @@ async function loadSessionAndAccounts(){
 function clearSession(){
   localStorage.removeItem("ts_session_token");
   state.sessionToken = "";
+  state.accounts = [];
 }
 
 async function logout(){
@@ -939,15 +998,28 @@ async function logout(){
   showLogin();
 }
 
+function hideBoot(){
+  $("#bootView")?.classList.add("hidden");
+}
+
+function showBoot(){
+  $("#bootView")?.classList.remove("hidden");
+  $("#loginView").classList.add("hidden");
+  $("#portalView").classList.add("hidden");
+}
+
 function showLogin(){
+  hideBoot();
   $("#portalView").classList.add("hidden");
   $("#loginView").classList.remove("hidden");
 }
 
 function showPortal(){
+  hideBoot();
   $("#loginView").classList.add("hidden");
   $("#portalView").classList.remove("hidden");
 }
+
 
 function buildRenewMessage(acc){
   return `*Hola TopStreaming 👋*\n_Quiero adelantar mi renovación._\n\n✅ Cuenta: *${acc.accountRaw}*\n✅ Perfil: ${acc.profile || "—"}\n💰 Monto: ${amountText(acc.amount)}\n📅 Fecha de renovación: ${acc.renewalDate || "—"}`;
@@ -1353,11 +1425,18 @@ document.getElementById("bnProductos")?.addEventListener("click", () => {
 
 document.getElementById("bnCuentas")?.addEventListener("click", async () => {
   if (state.sessionToken) {
-    await loadSessionAndAccounts();
+    showBoot();
+    try{
+      await loadSessionAndAccounts();
+    }catch(e){
+      clearSession();
+      showLogin();
+    }
   } else {
     showLogin();
   }
 });
+
 
 document.getElementById("bnPeliculas")?.addEventListener("click", () => {
   window.open("https://www.justwatch.com/pe", "_blank", "noopener");
@@ -1369,14 +1448,21 @@ document.getElementById("bnContacto")?.addEventListener("click", () => {
   
   (async function init(){
   setLogo();
+  showBoot();
   validateLogin(false);
 
   if(state.sessionToken){
-    await loadSessionAndAccounts();
+    try{
+      await loadSessionAndAccounts();
+    }catch(e){
+      clearSession();
+      showLogin();
+    }
   }else{
     showLogin();
   }
 })();
+
 </script>
 </body>
 </html>
