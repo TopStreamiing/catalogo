@@ -1,1180 +1,1222 @@
 <!doctype html>
 <html lang="es">
 <head>
-
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JFW92G0TS1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-JFW92G0TS1');
-</script>
-
-  
-  
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link rel="apple-touch-icon" href="assets/favicon.png">
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Portal Clientes</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
 
   <style>
     :root{
-  --bg:#0b0f17;
-  --card:#121a26;
-  --card2:#0f1624;
-  --text:#e2e8f0;
-  --muted:#94a3b8;
-  --muter:rgba(148,163,184,.78);
-  --border: rgba(148,163,184,.15);
+      --bg:#0b0f17;
+      --card:#121a26;
+      --card2:#0f1624;
+      --text:#e2e8f0;
+      --muted:#94a3b8;
+      --line:rgba(255,255,255,.09);
 
-  --accent:#38bdf8;   /* cian */
-  --ok:#22c55e;       /* verde */
-  --bad:#ef4444;      /* rojo */
+      --primary:#38bdf8;
+      --ok:#22c55e;
+      --warn:#facc15;
+      --danger:#ef4444;
 
-  --primary:#38bdf8;
-  --primary2:#22c55e;
+      --shadow:0 18px 55px rgba(0,0,0,.45);
+      --radius:18px;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+    }
 
-  --chip:rgba(148,163,184,.10);
-  --shadow:0 18px 55px rgba(0,0,0,.45);
-  --radius:18px;
-  --danger:#ef4444;
-
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
-}
-
-
+    *{box-sizing:border-box}
     body{
-  margin:0;
-  min-height:100vh;
-  color:var(--text);
-  background:
-    radial-gradient(900px 520px at 14% 10%, rgba(34,197,94,.20), transparent 60%),
-    radial-gradient(900px 520px at 86% 18%, rgba(56,189,248,.18), transparent 60%),
-    linear-gradient(180deg, #050812, var(--bg));
-}
+      margin:0;
+      color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(900px 520px at 14% 10%, rgba(34,197,94,.20), transparent 60%),
+        radial-gradient(900px 520px at 86% 18%, rgba(56,189,248,.18), transparent 60%),
+        linear-gradient(180deg, #050812, var(--bg));
+    }
 
+    .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 90px}
+    .hidden{display:none !important}
 
-    .wrap{ max-width: 860px; margin: 0 auto; padding: 26px 16px 44px; }
-    .header{ display:flex; gap:14px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
-
-    .logo{
-      height:72px; width:auto; border-radius: 14px;
-      background: rgba(255,255,255,.06);
+    .brandTop{
+      text-align:center;
+      padding:18px 8px 10px;
+    }
+    .brandLogo{
+      width:min(120px,28vw);
+      height:auto;
+      object-fit:contain;
+      border-radius:18px;
       padding:10px;
-      border: 1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+    }
+    .brandTitle{
+      margin:14px 0 6px;
+      font-size:28px;
+      font-weight:1000;
+    }
+    .brandSub{
+      margin:0 auto;
+      max-width:580px;
+      color:var(--muted);
+      line-height:1.45;
+      font-size:14px;
     }
 
-    .headtext h1{ font-size: 22px; margin:0; letter-spacing:.2px; }
-    .headtext p{ margin:4px 0 0; color: var(--muted); font-size: 13px; }
+    .loginCard,.card{
+      background:rgba(18,26,38,.95);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
 
-    .dot{
-  display:inline-block; width:8px;height:8px;border-radius:999px;
-  background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(56,189,248,.95));
-  margin-right:8px; vertical-align: middle;
-}
+    .loginBox{
+      max-width:520px;
+      margin:20px auto 0;
+      padding:22px;
+    }
+    .loginBox h2{
+      margin:0 0 8px;
+      font-size:24px;
+    }
+    .loginIntro{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size:14px;
+      font-style:italic;
+      line-height:1.45;
+    }
 
-
-    .catalogBtn{
-      margin-left:auto;
+    .fieldWrap{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+    .fieldWrap label{
+      font-size:13px;
+      font-weight:900;
+      color:var(--muted);
+    }
+    .inputShell{
+      position:relative;
       display:flex;
-      flex-direction:column;
-      gap:4px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      text-decoration:none;
-      color: #fff;
-      background: linear-gradient(180deg, rgba(34,197,94,.22), rgba(34,197,94,.08));
-      border: 1px solid rgba(34,197,94,.30);
-      box-shadow: 0 14px 40px rgba(0,0,0,.28);
-      transition: .16s ease;
-      white-space: nowrap;
-      min-width: 210px;
-      align-items:flex-start;
-      cursor:pointer;
-      user-select:none;
-    }
-    .catalogBtn:hover{ transform: translateY(-1px); border-color: rgba(34,197,94,.55); }
-    .catalogTitle{ font-weight: 1000; font-size: 13px; display:flex; align-items:center; gap:8px; letter-spacing: .2px; }
-    .catalogSub{ font-size: 11.5px; color: rgba(234,240,255,.78); font-weight: 800; }
-    @media (max-width: 620px){
-      .catalogBtn{ min-width: unset; padding: 10px 12px; }
-      .catalogSub{ display:none; }
-    }
-
-    .card{
-  background: rgba(18,26,38,.95);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 18px;
-  backdrop-filter: blur(10px);
-}
-
-
-    .tabs{ display:flex; gap:10px; margin: 8px 0 16px; flex-wrap:wrap; }
-
-    .tab{
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 10px 14px;
-      cursor:pointer;
-      font-weight: 900;
-      font-size: 13px;
-      transition:.15s ease;
-      user-select:none;
-    }
-    .tab.active{
-  background: rgba(56,189,248,.12);
-  border-color: rgba(56,189,248,.45);
-  box-shadow: 0 10px 30px rgba(56,189,248,.10);
-}
-
-
-    .grid{ display:grid; gap: 12px; }
-
-    label{
-      display:block;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 900;
-      margin-bottom: 8px;
-    }
-
-    input, select{
-  width:100%;
-  box-sizing:border-box;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: rgba(15,22,36,.55);
-  color: var(--text);
-  padding: 12px 14px;
-  font-size: 14px;
-  outline:none;
-}
-
-input::placeholder{ color: rgba(148,163,184,.75); }
-
-input:focus, select:focus{
-  border-color: rgba(34,197,94,.55);
-  box-shadow: 0 0 0 4px rgba(34,197,94,.14), 0 0 30px rgba(56,189,248,.10);
-}
-
-    input::placeholder{ color: rgba(234,240,255,.45); }
-
-    /* Validación visual */
-    .fieldWrap{ display:flex; flex-direction:column; gap:6px; }
-    .field-error{
-      border-color: rgba(255,122,122,.65) !important;
-      box-shadow: 0 0 0 3px rgba(255,122,122,.12);
-    }
-    .err{
-      min-height: 16px;
-      font-size: 12px;
-      color: rgba(255,122,122,.92);
-      font-weight: 800;
-      line-height: 1.25;
-    }
-
-    .actions{
-      display:flex;
-      gap:10px;
       align-items:center;
-      flex-wrap:wrap;
-      margin-top: 10px;
+    }
+    .inputIcon{
+      position:absolute;
+      left:14px;
+      font-size:16px;
+      opacity:.85;
+      pointer-events:none;
+    }
+    input,select{
+      width:100%;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(15,22,36,.55);
+      color:var(--text);
+      padding:13px 14px 13px 42px;
+      font-size:14px;
+      outline:none;
+    }
+    select{padding-left:14px}
+    input::placeholder{color:rgba(148,163,184,.8)}
+    input:focus,select:focus{
+      border-color:rgba(56,189,248,.55);
+      box-shadow:0 0 0 4px rgba(56,189,248,.14);
+    }
+
+    .err{
+      min-height:16px;
+      font-size:12px;
+      color:#ff9c9c;
+      font-weight:800;
+    }
+    .field-error{
+      border-color:rgba(239,68,68,.6)!important;
+      box-shadow:0 0 0 3px rgba(239,68,68,.12)!important;
     }
 
     .btn{
       border:0;
-      border-radius: 14px;
-      padding: 11px 16px;
-      font-weight: 1000;
+      border-radius:14px;
+      padding:12px 16px;
+      font-size:14px;
+      font-weight:1000;
       cursor:pointer;
-      font-size: 14px;
-      transition:.15s ease;
+      transition:.18s ease;
     }
-
-    .btn.primary{
-  background: linear-gradient(90deg, rgba(56,189,248,.22), rgba(34,197,94,.12));
-  border: 1px solid rgba(56,189,248,.35);
-  color: #e2e8f0;
-  box-shadow: 0 14px 35px rgba(56,189,248,.12);
-}
-.btn.primary:hover{
-  transform: translateY(-1px);
-  border-color: rgba(34,197,94,.70);
-}
-
-
-    .btn.ghost{
-  background: rgba(15,22,36,.45);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: var(--chip);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 1000;
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .btnPrimary{
+      width:100%;
+      color:#fff;
+      background:linear-gradient(90deg, rgba(56,189,248,.95), rgba(34,197,94,.95));
+      box-shadow:0 14px 35px rgba(56,189,248,.15);
     }
-
-    .hint{
-      margin-top: 10px;
-      color: var(--muter);
-      font-size: 12px;
-      line-height: 1.35;
+    .btnPrimary:hover{transform:translateY(-1px)}
+    .btnGhost{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);
     }
-
-    .status{
-  margin-top: 12px;
-  background: rgba(15,22,36,.45);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 12px;
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.35;
-  min-height: 44px;
-}
-
-
-    .loader{
-      margin-top: 10px;
-      color: var(--muted);
-      font-weight: 1000;
-      font-size: 13px;
-      display:none;
+    .btnWarn{
+      background:rgba(250,204,21,.14);
+      border:1px solid rgba(250,204,21,.35);
+      color:#ffe68a;
     }
-    .loader.show{ display:block; }
-
-    .hidden{ display:none !important; }
-
-    @media (min-width: 720px){
-      .grid.two{ grid-template-columns: 1fr 1fr; align-items:end; }
-      .grid.three{ grid-template-columns: 1fr 1fr 1fr; align-items:end; }
+    .btnDanger{
+      background:rgba(239,68,68,.12);
+      border:1px solid rgba(239,68,68,.35);
+      color:#ffb0b0;
     }
-
-    .resultTitle{ font-weight:1000; font-size:16px; margin-bottom:10px; }
-    .greenTitle{ color:#7CFFB2; }
-    .yellowTitle{ color:#FFD36E; }
-    .redTitle{ color:#FF7A7A; }
-    .line{ margin-top:6px; }
-    .label2{ color: rgba(234,240,255,.72); }
-
-    .boxLink{
+    .loginHelp{
       margin-top:12px;
-      border: 1px dashed rgba(255,255,255,.18);
-      background: rgba(8, 14, 32, .35);
-      border-radius: 14px;
-      padding: 12px;
-      word-break: break-all;
-      color: rgba(234,240,255,.92);
-      font-size: 12.5px;
-      line-height: 1.35;
-    }
-
-    .otpBox{
-      margin-top:12px;
-      border: 1px dashed rgba(255,255,255,.18);
-      background: rgba(8, 14, 32, .35);
-      border-radius: 14px;
-      padding: 14px 12px;
+      font-size:12px;
+      color:rgba(226,232,240,.78);
       text-align:center;
-      font-weight: 1000;
-      font-size: 26px;
-      letter-spacing: 2px;
-      color: rgba(234,240,255,.96);
     }
 
-        /* =========================
-       BOTTOM NAV SOLO MÓVIL
-    ========================= */
-    .bottomNav{
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 80;
-      display: none;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-      background: rgba(5,8,18,.96);
-      border-top: 1px solid rgba(255,255,255,.08);
-      box-shadow: 0 -10px 30px rgba(0,0,0,.35);
-      backdrop-filter: blur(10px);
-    }
-
-    .bottomNav-item{
-      appearance: none;
-      border: 0;
-      background: transparent;
-      color: rgba(226,232,240,.82);
+    .portalHeader{
+      position:sticky;
+      top:0;
+      z-index:20;
       display:flex;
-      flex-direction:column;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      margin-bottom:16px;
+      background:rgba(8,12,20,.92);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      backdrop-filter:blur(10px);
+      box-shadow:0 10px 30px rgba(0,0,0,.28);
+    }
+
+    .portalHeadLeft{display:flex;align-items:center;gap:12px;min-width:0}
+    .avatarBubble{
+      width:42px;height:42px;border-radius:999px;
+      display:grid;place-items:center;
+      font-weight:1000;
+      background:linear-gradient(135deg, rgba(56,189,248,.22), rgba(34,197,94,.22));
+      border:1px solid rgba(56,189,248,.35);
+      color:#fff;
+      flex:0 0 auto;
+    }
+    .headName{
+      font-size:18px;
+      font-weight:1000;
+      margin:0;
+    }
+    .headSub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+    .logoutBtn{
+      white-space:nowrap;
+      border:1px solid rgba(239,68,68,.45);
+      background:rgba(239,68,68,.14);
+      color:#ffb0b0;
+      padding:11px 15px;
+      border-radius:14px;
+      font-weight:1000;
+      cursor:pointer;
+    }
+
+    .cardsGrid{
+      display:grid;
+      gap:16px;
+    }
+    @media (min-width:900px){
+      .cardsGrid{grid-template-columns:repeat(2,1fr)}
+    }
+
+    .accountCard{
+      overflow:hidden;
+      padding:0;
+    }
+    .cardTopImg{
+      width:100%;
+      height:126px;
+      object-fit:contain;
+      background:linear-gradient(180deg, rgba(56,189,248,.08), rgba(255,255,255,.02));
+      padding:18px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    .cardBody{
+      padding:18px;
+    }
+    .cardTitle{
+      font-size:20px;
+      font-weight:1000;
+      margin:0;
+    }
+    .cardProfile{
+      margin-top:6px;
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+    }
+
+    .metaRow{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:16px;
+    }
+    .metaBox{
+      border-radius:14px;
+      padding:12px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.07);
+    }
+    .metaLabel{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+    }
+    .metaValue{
+      margin-top:6px;
+      font-size:18px;
+      font-weight:1000;
+    }
+    .daysOk{color:#89ffb5}
+    .daysWarn{color:#ffe58a}
+    .daysBad{color:#ffb0b0}
+
+    .smallInfo{
+      margin-top:14px;
+      display:grid;
+      gap:8px;
+      font-size:13px;
+      color:rgba(226,232,240,.86);
+    }
+    .smallInfo b{color:#fff}
+
+    .maintenanceBox{
+      margin-top:14px;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(250,204,21,.14);
+      border:1px solid rgba(250,204,21,.38);
+      color:#ffe58a;
+      font-size:13px;
+      line-height:1.45;
+      font-weight:900;
+    }
+
+    .actionsGrid{
+      margin-top:16px;
+      display:grid;
+      gap:10px;
+      grid-template-columns:1fr;
+    }
+    @media (min-width:520px){
+      .actionsGrid{grid-template-columns:repeat(2,1fr)}
+      .actionsGrid .full{grid-column:1/-1}
+    }
+
+    .modalBack{
+      position:fixed;
+      inset:0;
+      z-index:200;
+      background:rgba(0,0,0,.62);
+      display:none;
       align-items:center;
       justify-content:center;
-      gap:4px;
-      padding:8px 4px;
-      min-height:58px;
+      padding:18px;
+    }
+    .modalBack.show{display:flex}
+    .modal{
+      width:min(680px,100%);
+      max-height:90vh;
+      overflow:auto;
+      background:rgba(18,26,38,.98);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:22px;
+      box-shadow:0 24px 80px rgba(0,0,0,.55);
+      padding:18px;
+      position:relative;
+    }
+    .modalClose{
+      position:absolute;
+      top:12px;
+      right:12px;
+      width:40px;
+      height:40px;
+      border-radius:999px;
+      border:1px solid rgba(239,68,68,.4);
+      background:rgba(239,68,68,.16);
+      color:#ffd4d4;
+      font-size:20px;
+      font-weight:1000;
       cursor:pointer;
+    }
+    .modalTitle{
+      margin:0 48px 6px 0;
+      font-size:22px;
+      font-weight:1000;
+    }
+    .modalSub{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:14px;
+      line-height:1.45;
+    }
+    .infoBox{
+      margin-bottom:14px;
+      border-radius:16px;
+      padding:14px;
+      background:rgba(250,204,21,.11);
+      border:1px solid rgba(250,204,21,.28);
+      color:#ffe58a;
+      font-size:13px;
+      line-height:1.55;
+    }
+    .infoBox b{color:#fff4b3}
+    .optionGrid{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+    .optionBtn{
+      text-align:left;
+      width:100%;
       border-radius:14px;
-      transition: background .15s ease, color .15s ease, transform .08s ease;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      font-weight:900;
+      padding:12px 14px;
+      cursor:pointer;
+    }
+    .optionBtn.active{
+      border-color:rgba(56,189,248,.5);
+      background:rgba(56,189,248,.14);
+      box-shadow:0 0 0 3px rgba(56,189,248,.10);
     }
 
-    .bottomNav-item:active{
-      transform: translateY(1px);
+    .attempts{
+      margin-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:1000;
     }
 
-    .bottomNav-item.active{
-      color: #22c55e;
-      background: rgba(34,197,94,.08);
+    .loader{
+      margin-top:12px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:1000;
+      display:none;
+    }
+    .loader.show{display:block}
+
+    .resultBox{
+      margin-top:14px;
+      border-radius:16px;
+      padding:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      line-height:1.5;
+    }
+    .resultTitle{
+      font-size:20px;
+      font-weight:1000;
+      margin-bottom:12px;
+    }
+    .resultMeta{
+      color:rgba(226,232,240,.84);
+      font-size:13px;
+      margin-bottom:4px;
+    }
+    .resultCode{
+      margin-top:12px;
+      padding:14px;
+      text-align:center;
+      font-size:30px;
+      letter-spacing:2px;
+      font-weight:1000;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px dashed rgba(255,255,255,.15);
+    }
+    .resultLink{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px dashed rgba(255,255,255,.15);
+      font-size:13px;
+      word-break:break-all;
     }
 
-    .bottomNav-icon{
-      font-size: 20px;
-      line-height: 1;
+    .modalButtons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
     }
 
-    .bottomNav-label{
-      font-size: 11px;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: .1px;
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:20px;
+      transform:translateX(-50%);
+      z-index:300;
+      display:none;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(0,0,0,.85);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.15);
+      font-weight:900;
+      font-size:13px;
     }
-
-    @media (max-width:720px){
-      .bottomNav{
-        display:grid;
-      }
-
-      body{
-        padding-bottom: 86px;
-      }
-    }
-    
+    .toast.show{display:block}
   </style>
 </head>
-
 <body>
+
   <div class="wrap">
-    <div class="header">
-      <img class="logo" id="logoImg" alt="Logo" onerror="this.style.display='none'">
-
-      <div class="headtext">
-        <h1><span class="dot"></span>Portal de Clientes</h1>
-        <p>Selecciona una opción para continuar. (Hora de referencia: PET)</p>
+    <!-- LOGIN -->
+    <section id="loginView">
+      <div class="brandTop">
+        <img id="logoImg" class="brandLogo" alt="Logo">
+        <div class="brandTitle">Portal de Clientes</div>
+        <p class="brandSub">Accede a tus cuentas, contraseñas y solicitudes de código desde un solo lugar.</p>
       </div>
 
-      <div class="catalogBtn" id="btnCatalog">
-        <div class="catalogTitle">🛍️ Volver al catálogo</div>
-        <div class="catalogSub">Ver planes y disponibilidad →</div>
+      <div class="loginCard loginBox">
+        <h2>Iniciar sesión</h2>
+        <p class="loginIntro">Ingresa tu número de celular y el PIN que registraste al contratar uno de tus perfiles.</p>
+
+        <div class="fieldWrap">
+          <label>Número de celular</label>
+          <div class="inputShell">
+            <span class="inputIcon">📱</span>
+            <input id="loginPhone" type="text" placeholder="+51 999 999 999">
+          </div>
+          <div id="errLoginPhone" class="err"></div>
+        </div>
+
+        <div class="fieldWrap">
+          <label>PIN de acceso</label>
+          <div class="inputShell">
+            <span class="inputIcon">🔒</span>
+            <input id="loginPin" type="password" maxlength="5" placeholder="1234">
+          </div>
+          <div id="errLoginPin" class="err"></div>
+        </div>
+
+        <button id="btnLogin" class="btn btnPrimary" disabled>Ingresar</button>
+        <div class="loginHelp">Usa el mismo número con el que contrataste tu cuenta.</div>
+        <div id="loginStatus" class="resultBox hidden" style="margin-top:14px"></div>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <div class="tabs">
-        <div id="tabNetflix" class="tab active" onclick="switchTab('netflix')">Código Netflix</div>
-        <div id="tabDisney" class="tab" onclick="switchTab('disney')">Código Disney</div>
-        <div id="tabAccounts" class="tab" onclick="switchTab('accounts')">Mis cuentas</div>
-      </div>
-
-      <!-- PANEL NETFLIX -->
-      <div id="panelNetflix">
-        <div class="grid three">
-          <div class="fieldWrap">
-            <label>Ingresa tu número de celular</label>
-            <input id="phoneNetflix" inputmode="tel" placeholder="+51 999 999 999">
-            <div class="err" id="errPhoneNetflix"></div>
-          </div>
-
-          <div class="fieldWrap">
-            <label>PIN de tu perfil (4 dígitos)</label>
-            <input id="pinNetflix" inputmode="numeric" maxlength="4" placeholder="0000">
-            <div class="err" id="errPinNetflix"></div>
-          </div>
-
-          <div class="fieldWrap">
-            <label>¿Qué opción te sale?</label>
-            <select id="opcionNetflix">
-              <option value="" selected disabled>Seleccionar opción…</option>
-              <option value="viaje">Estoy de viaje</option>
-              <option value="temporal">Ver temporalmente</option>
-              <option value="hogar">Actualizar hogar</option>
-            </select>
-            <div class="err" id="errOptNetflix"></div>
+    <!-- DASHBOARD -->
+    <section id="portalView" class="hidden">
+      <div class="portalHeader">
+        <div class="portalHeadLeft">
+          <div id="userInitial" class="avatarBubble">R</div>
+          <div>
+            <div id="userName" class="headName">Bienvenido, Ruru</div>
+            <div class="headSub">Cliente TopStreaming</div>
           </div>
         </div>
-
-        <div class="actions">
-          <button id="btnSearchNetflix" class="btn primary" onclick="searchNetflix()" disabled>Buscar código</button>
-          <button id="btnRetryNetflix" class="btn ghost" onclick="retryNetflix()" disabled>Reintentar</button>
-          <span id="remainNetflix" class="chip">Te quedan — de 2</span>
-        </div>
-
-        <div id="loaderNetflix" class="loader">🔎 Buscando…</div>
-        <div id="outNetflix" class="status"></div>
-
-        <div class="hint">
-          Recuerda darle a <b>“Enviar email”</b> desde tu dispositivo, sino no llegará.<br>
-          Si aún no aparece, espera 60 segundos y presiona <b>Reintentar</b>. Si persiste, solicita vía WhatsApp con los asesores.
-        </div>
+        <button id="btnLogout" class="logoutBtn">Cerrar sesión</button>
       </div>
 
-      <!-- PANEL DISNEY -->
-      <div id="panelDisney" class="hidden">
-        <div class="grid three">
-          <div class="fieldWrap">
-            <label>Ingresa tu número de celular</label>
-            <input id="phoneDisney" inputmode="tel" placeholder="+51 999 999 999">
-            <div class="err" id="errPhoneDisney"></div>
-          </div>
+      <div id="cardsGrid" class="cardsGrid"></div>
+    </section>
+  </div>
 
-          <div class="fieldWrap">
-            <label>PIN de tu perfil (4 dígitos)</label>
-            <input id="pinDisney" inputmode="numeric" maxlength="4" placeholder="0000">
-            <div class="err" id="errPinDisney"></div>
-          </div>
-
-          <div class="fieldWrap">
-            <label>Motivo</label>
-            <select id="motivoDisney">
-              <option value="" selected disabled>Seleccionar motivo…</option>
-              <option value="Iniciar sesión (Celular/PC)">Iniciar sesión (Celular/PC)</option>
-              <option value="Activar TV">Activar TV</option>
-              <option value="Estoy fuera de casa">Estoy fuera de casa</option>
-            </select>
-            <div class="err" id="errMotivoDisney"></div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button id="btnSearchDisney" class="btn primary" onclick="searchDisney()" disabled>Buscar código</button>
-          <button id="btnRetryDisney" class="btn ghost" onclick="retryDisney()" disabled>Reintentar</button>
-          <span id="remainDisney" class="chip">Te quedan — de 2</span>
-        </div>
-
-        <div id="loaderDisney" class="loader">🔎 Buscando código…</div>
-        <div id="outDisney" class="status"></div>
-
-        <div class="hint">
-          ⚠️ <b>Importante:</b> No solicites ni compartas códigos innecesariamente.<br>
-          Evita solicitar <b>3 códigos consecutivos</b>: Disney+ puede restringir temporalmente el acceso por seguridad (hasta 12 horas).
-        </div>
-      </div>
-
-      <!-- PANEL CUENTAS -->
-      <div id="panelAccounts" class="hidden">
-        <div class="grid two">
-          <div class="fieldWrap">
-            <label>Ingresa tu número de celular</label>
-            <input id="phoneAccount" inputmode="tel" placeholder="+51 999 999 999">
-            <div class="err" id="errPhoneAccount"></div>
-          </div>
-
-          <div class="fieldWrap">
-            <label>Plataforma</label>
-            <select id="platform"></select>
-            <div class="err" id="errPlatform"></div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button id="btnAccount" class="btn primary" onclick="checkAccount()" disabled>🧾 Revisar mi cuenta</button>
-          <span id="remainAccount" class="chip">Te quedan — de 2</span>
-        </div>
-
-        <div id="loaderAccount" class="loader">🔎 Verificando…</div>
-        <div id="outAccount" class="status"></div>
-      </div>
-
+  <!-- MODAL -->
+  <div id="modalBack" class="modalBack">
+    <div class="modal">
+      <button id="modalClose" class="modalClose">✕</button>
+      <div id="modalContent"></div>
     </div>
   </div>
 
-    <!-- Bottom nav solo móvil -->
-  <nav class="bottomNav" id="bottomNav" aria-label="Navegación móvil">
-    <button class="bottomNav-item" id="bnProductos" type="button">
-      <span class="bottomNav-icon">🛍️</span>
-      <span class="bottomNav-label">Productos</span>
-    </button>
+  <div id="toast" class="toast">✅ Copiado</div>
 
-    <button class="bottomNav-item active" id="bnCuentas" type="button">
-      <span class="bottomNav-icon">👤</span>
-      <span class="bottomNav-label">Mis cuentas</span>
-    </button>
-
-    <button class="bottomNav-item" id="bnPeliculas" type="button">
-      <span class="bottomNav-icon">🍿</span>
-      <span class="bottomNav-label">Películas</span>
-    </button>
-
-    <button class="bottomNav-item" id="bnContacto" type="button">
-      <span class="bottomNav-icon">💬</span>
-      <span class="bottomNav-label">Contacto</span>
-    </button>
-  </nav>
-
-  
 <script>
-  /* ======================
-     CONFIG (EDITA SOLO ESTO)
-     ====================== */
-  const API_BASE = "https://chesttop-api.fam-premium2720.workers.dev";
-  const CATALOG_URL = "https://www.chesttop.com/";
-  const LIMIT_MAX = 2;
-
-  // Logo opcional (si no quieres, déjalo vacío)
-  const LOGO_URL = "assets/cards/Logo.png";
-
-  // Plataformas (dropdown Mis cuentas)
-  const PLATFORMS = [
-    "NETFLIX","DISNEY","MAX","MAXPLATINO","PRIME","VIX","CRUNCHY","CHATGPT",
-    "PARAMOUNT","DEEZER","CAPCUT","VIKI","FLUJOTV"
-  ];
-
-  const UPDATE_HOME_MESSAGE =
-`🏠 Actualizar hogar (Netflix)
-Este caso no se resuelve con código automático.
-
-⚡ Requiere cambio de cuenta (solución inmediata).
-📲 Contáctanos por WhatsApp para proceder con ello.
-
-✅ Tip: Si te salen las opciones “Estoy de viaje” o “Ver temporalmente”, ahí sí podemos generarte el enlace/código desde el portal.`;
-
-  const NETFLIX_NO_EMAIL_COPY =
-`⏳ Espera 60 segundos y presiona Reintentar.
-📌 NO dar clic en "Reenviar email".
-Si aún no llega el código, contacta soporte por WhatsApp.`;
-
-  document.getElementById("btnCatalog").addEventListener("click", () => {
-    window.open(CATALOG_URL, "_self");
-  });
-
-  const logoImg = document.getElementById("logoImg");
-  if (LOGO_URL) logoImg.src = LOGO_URL; else logoImg.style.display = "none";
-
-  function esc(s){
-    return String(s ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-  function outHTML(elId, html){ document.getElementById(elId).innerHTML = html || ""; }
-
-  function getDeviceId(){
-    const k = "ct_device_id";
-    let id = localStorage.getItem(k);
-    if(!id){
-      id = "dvc_" + Math.random().toString(36).slice(2) + "_" + Date.now().toString(36);
-      localStorage.setItem(k, id);
-    }
-    return id;
-  }
-
-  function maskEmail(email){
-    const e = String(email || "").trim();
-    const at = e.lastIndexOf("@");
-    if(at < 0) return e;
-    const user = e.slice(0, at);
-    const dom = e.slice(at);
-    if(user.length === 0) return "***" + dom;
-    if(user.length === 1) return user[0] + "***" + dom;
-    if(user.length === 2) return user.slice(0,2) + "***" + dom;
-    return `${user.slice(0,2)}***${user.slice(-1)}${dom}`;
-  }
-
-  function switchTab(which){
-    const tabN = document.getElementById("tabNetflix");
-    const tabD = document.getElementById("tabDisney");
-    const tabA = document.getElementById("tabAccounts");
-    const panN = document.getElementById("panelNetflix");
-    const panD = document.getElementById("panelDisney");
-    const panA = document.getElementById("panelAccounts");
-
-    tabN.classList.remove("active");
-    tabD.classList.remove("active");
-    tabA.classList.remove("active");
-    panN.classList.add("hidden");
-    panD.classList.add("hidden");
-    panA.classList.add("hidden");
-
-    if(which === "netflix"){ tabN.classList.add("active"); panN.classList.remove("hidden"); }
-    else if(which === "disney"){ tabD.classList.add("active"); panD.classList.remove("hidden"); }
-    else { tabA.classList.add("active"); panA.classList.remove("hidden"); }
-  }
-
-  function setRemain(elId, remaining){
-    const el = document.getElementById(elId);
-    if(typeof remaining === "number") el.textContent = `Te quedan ${remaining} de ${LIMIT_MAX}`;
-    else el.textContent = `Te quedan — de ${LIMIT_MAX}`;
-  }
-
-  function setLoader(elId, on){
-    document.getElementById(elId).classList.toggle("show", !!on);
-  }
-
-  function renderError(title, msg){
-    return `
-      <div class="resultTitle redTitle">❌ ${esc(title || "No se pudo completar")}</div>
-      <div style="color:rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
-        ${esc(msg || "Intenta nuevamente o contacta soporte.")}
-      </div>
-    `;
-  }
-
-  /* ===== Toast Copiado ===== */
-  let toastTimer = null;
-  function showToast(msg){
-    clearTimeout(toastTimer);
-    let t = document.getElementById("toastBox");
-    if(!t){
-      t = document.createElement("div");
-      t.id = "toastBox";
-      t.style.position = "fixed";
-      t.style.left = "50%";
-      t.style.bottom = "22px";
-      t.style.transform = "translateX(-50%)";
-      t.style.background = "rgba(10,10,20,.88)";
-      t.style.color = "#fff";
-      t.style.padding = "10px 14px";
-      t.style.borderRadius = "999px";
-      t.style.border = "1px solid rgba(255,255,255,.15)";
-      t.style.fontWeight = "900";
-      t.style.fontSize = "13px";
-      t.style.zIndex = "9999";
-      t.style.display = "none";
-      document.body.appendChild(t);
-    }
-    t.textContent = msg;
-    t.style.display = "block";
-    toastTimer = setTimeout(() => t.style.display = "none", 1400);
-  }
-
-  async function copyText(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-      showToast("✅ Copiado");
-    } catch (e) {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      ta.remove();
-      showToast("✅ Copiado");
-    }
-  }
-
-  /* ===== Cooldown (con protección vs validación) ===== */
-  const cooldownUntil = { netflix: 0, disney: 0, account: 0 };
-
-  function setButtonsDisabled(ids, disabled){
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.disabled = !!disabled;
-    });
-  }
-
-  function startCooldown(sectionKey, buttonIds, seconds, retryIdToLabel){
-    cooldownUntil[sectionKey] = Date.now() + seconds * 1000;
-
-    setButtonsDisabled(buttonIds, true);
-
-    const retryBtn = retryIdToLabel ? document.getElementById(retryIdToLabel) : null;
-    const originalRetryText = retryBtn ? retryBtn.textContent : "";
-
-    const tick = () => {
-      const left = cooldownUntil[sectionKey] - Date.now();
-      if(left <= 0){
-        cooldownUntil[sectionKey] = 0;
-        if(retryBtn) retryBtn.textContent = originalRetryText || "Reintentar";
-        // al terminar, revalida para habilitar correctamente
-        validateAll();
-        return;
-      }
-      if(retryBtn) retryBtn.textContent = `Reintentar (${Math.ceil(left/1000)}s)`;
-      requestAnimationFrame(tick);
-    };
-    tick();
-  }
-
-  /* ===== Validación UI ===== */
-  function setFieldError(idField, idErr, msg){
-    const el = document.getElementById(idField);
-    const err = document.getElementById(idErr);
-    if(!el || !err) return;
-
-    if(msg){
-      el.classList.add("field-error");
-      err.textContent = msg;
-    }else{
-      el.classList.remove("field-error");
-      err.textContent = "";
-    }
-  }
-
-  function isTouched(id){
-    const el = document.getElementById(id);
-    return el && el.dataset.touched === "1";
-  }
-  function markTouched(id){
-    const el = document.getElementById(id);
-    if(el) el.dataset.touched = "1";
-  }
-
-  function validPin4(pin){ return /^\d{4}$/.test(String(pin||"").trim()); }
-
-  function validateNetflix(){
-    const phone = document.getElementById("phoneNetflix").value.trim();
-    const pin = document.getElementById("pinNetflix").value.trim();
-    const opt = document.getElementById("opcionNetflix").value;
-
-    const okPhone = phone !== "";
-    const okPin = validPin4(pin);
-    const okOpt = opt !== "";
-
-    // errores solo si ya tocaron el campo (no apenas carga)
-    if(isTouched("phoneNetflix")) setFieldError("phoneNetflix","errPhoneNetflix", okPhone ? "" : "⚠️ Ingresa tu número de celular");
-    if(isTouched("pinNetflix")) setFieldError("pinNetflix","errPinNetflix", okPin ? "" : "⚠️ El PIN debe tener 4 dígitos");
-    if(isTouched("opcionNetflix")) setFieldError("opcionNetflix","errOptNetflix", okOpt ? "" : "⚠️ Debes seleccionar una opción");
-
-    const cooldown = Date.now() < cooldownUntil.netflix;
-    const enable = okPhone && okPin && okOpt && !cooldown;
-
-    document.getElementById("btnSearchNetflix").disabled = !enable;
-    document.getElementById("btnRetryNetflix").disabled = !enable;
-  }
-
-  function validateDisney(){
-    const phone = document.getElementById("phoneDisney").value.trim();
-    const pin = document.getElementById("pinDisney").value.trim();
-    const motivo = document.getElementById("motivoDisney").value;
-
-    const okPhone = phone !== "";
-    const okPin = validPin4(pin);
-    const okMotivo = motivo !== "";
-
-    if(isTouched("phoneDisney")) setFieldError("phoneDisney","errPhoneDisney", okPhone ? "" : "⚠️ Ingresa tu número de celular");
-    if(isTouched("pinDisney")) setFieldError("pinDisney","errPinDisney", okPin ? "" : "⚠️ El PIN debe tener 4 dígitos");
-    if(isTouched("motivoDisney")) setFieldError("motivoDisney","errMotivoDisney", okMotivo ? "" : "⚠️ Selecciona un motivo");
-
-    const cooldown = Date.now() < cooldownUntil.disney;
-    const enable = okPhone && okPin && okMotivo && !cooldown;
-
-    document.getElementById("btnSearchDisney").disabled = !enable;
-    document.getElementById("btnRetryDisney").disabled = !enable;
-  }
-
-  function validateAccount(){
-    const phone = document.getElementById("phoneAccount").value.trim();
-    const plat = document.getElementById("platform").value;
-
-    const okPhone = phone !== "";
-    const okPlat = plat !== "";
-
-    if(isTouched("phoneAccount")) setFieldError("phoneAccount","errPhoneAccount", okPhone ? "" : "⚠️ Ingresa tu número de celular");
-    if(isTouched("platform")) setFieldError("platform","errPlatform", okPlat ? "" : "⚠️ Selecciona una plataforma");
-
-    const cooldown = Date.now() < cooldownUntil.account;
-    const enable = okPhone && okPlat && !cooldown;
-
-    document.getElementById("btnAccount").disabled = !enable;
-  }
-
-  function validateAll(){
-    validateNetflix();
-    validateDisney();
-    validateAccount();
-  }
-
-  // marcar touched cuando interactúa
-  function wireTouched(id){
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.addEventListener("input", () => { markTouched(id); validateAll(); });
-    el.addEventListener("change", () => { markTouched(id); validateAll(); });
-    el.addEventListener("blur", () => { markTouched(id); validateAll(); });
-  }
-
-  /* ===== Renderers ===== */
-  function renderNetflix(res){
-    const emailMasked = esc(maskEmail(res.email || ""));
-    const time = esc(res.timeText || "");
-    const status = esc(res.statusText || "");
-    const link = (res.link || "").trim();
-
-    const isExpired = (res.kind === "expired");
-    const titleCls = isExpired ? "yellowTitle" : "greenTitle";
-    const icon = isExpired ? "⚠️" : "✅";
-
-    if(res.kind === "no_email"){
-      return `
-        <div class="resultTitle redTitle">❌ Aún no recibimos el correo de Netflix</div>
-        <div class="line">Correo: <b>${emailMasked}</b></div>
-        <div class="line">📩 <span class="label2">Buscado en:</span> <b>${emailMasked}</b></div>
-        <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso temporal de Netflix</b></div>
-        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
-          ${esc(NETFLIX_NO_EMAIL_COPY)}
-        </div>
-      `;
-    }
-
-    let linkBlock = "";
-    if(!isExpired && link){
-      linkBlock = `
-        <div class="boxLink">${esc(link)}</div>
-        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn primary" onclick="window.open('${esc(link)}','_blank')">Abrir enlace</button>
-          <button class="btn ghost" onclick="copyText('${esc(link)}')">Copiar enlace</button>
-        </div>
-      `;
-    }
-
-    let expireBlock = "";
-    if(isExpired){
-      expireBlock = `
-        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35;">
-          📝 Este correo ya no es válido (superó los 15 minutos).<br>
-          Reintenta para que tome el último código enviado o reenvía el email desde tu dispositivo.
-        </div>
-      `;
-    }
-
-    return `
-      <div class="resultTitle ${titleCls}">${icon} Tu código de acceso temporal de Netflix</div>
-      <div class="line">Correo: <b>${emailMasked}</b></div>
-      ${time ? `<div class="line">🕒 <span class="label2">Hora:</span> <b>${time} (PET)</b></div>` : ``}
-      <div class="line">📌 <span class="label2">Estado:</span> <b>${status}</b></div>
-      <div class="line">📩 <span class="label2">Buscado en:</span> <b>${emailMasked}</b></div>
-      <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso temporal de Netflix</b></div>
-      ${linkBlock || expireBlock}
-    `;
-  }
-
-  function renderDisney(res){
-    const emailMasked = esc(maskEmail(res.email || ""));
-    const time = esc(res.timeText || "");
-    const status = esc(res.statusText || "");
-    const code = String(res.code || "").trim();
-
-    const isExpired = (res.kind === "expired");
-    const titleCls = isExpired ? "yellowTitle" : "greenTitle";
-    const icon = isExpired ? "⚠️" : "✅";
-
-    if(res.kind === "domain_not_supported"){
-      return `
-        <div class="resultTitle redTitle">⚠️ Solicitud no disponible</div>
-        <div class="line">Correo: <b>${emailMasked}</b></div>
-        <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso único para Disney+</b></div>
-        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
-          ${esc(res.message || "Este correo no está habilitado para códigos automáticos. Contacta soporte.")}
-        </div>
-      `;
-    }
-
-    if(res.kind === "no_email"){
-      return `
-        <div class="resultTitle redTitle">❌ Aún no recibimos el correo de Disney+</div>
-        <div class="line">Correo: <b>${emailMasked}</b></div>
-        <div class="line">📩 <span class="label2">Buscado en:</span> <b>${emailMasked}</b></div>
-        <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso único para Disney+</b></div>
-        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
-          ${esc(res.message || "⏳ Espera 60 segundos y presiona Reintentar. Si persiste, contacta soporte.")}
-        </div>
-      `;
-    }
-
-    let codeBlock = "";
-    if(!isExpired && code){
-      codeBlock = `
-        <div class="otpBox">${esc(code)}</div>
-        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn primary" onclick="copyText('${esc(code)}')">📋 Copiar código</button>
-        </div>
-      `;
-    }
-
-    let expireBlock = "";
-    if(isExpired){
-      expireBlock = `
-        <div style="margin-top:10px; color: rgba(234,240,255,.78); font-size:12.5px; line-height:1.35;">
-          📝 Este correo ya no es válido (superó los 15 minutos).<br>
-          Reintenta para que tome el último código enviado o vuelve a solicitar el email desde tu dispositivo.
-        </div>
-      `;
-    }
-
-    return `
-      <div class="resultTitle ${titleCls}">${icon} Tu código de acceso único para Disney+</div>
-      <div class="line">Correo: <b>${emailMasked}</b></div>
-      ${time ? `<div class="line">🕒 <span class="label2">Hora:</span> <b>${time} (PET)</b></div>` : ``}
-      <div class="line">📌 <span class="label2">Estado:</span> <b>${status}</b></div>
-      <div class="line">📩 <span class="label2">Buscado en:</span> <b>${emailMasked}</b></div>
-      <div class="line">🧾 <span class="label2">Asunto:</span> <b>Tu código de acceso único para Disney+</b></div>
-      ${codeBlock || expireBlock}
-    `;
-  }
-
-  function renderAccount(res){
-  const isMaintenance = res.maintenance === true;
-
-  const supportMsg =
-`Hola 👋
-Me aparece que mi cuenta está en *mantenimiento* y necesita soporte inmediato.
-📌 Plataforma: ${res.platform || ""}
-📧 Correo: ${res.email || ""}`;
-
-  const maintenanceBlock = isMaintenance ? `
-    <div style="
-      margin-top:14px;
-      padding:12px;
-      border-radius:12px;
-      background: rgba(255, 211, 110, 0.15);
-      border: 1px solid rgba(255, 211, 110, 0.45);
-      color:#FFD36E;
-      font-size:13px;
-      line-height:1.35;
-    ">
-      ⚠️ <b>Cuenta en mantenimiento</b><br>
-      Esta cuenta requiere soporte inmediato para restablecer el acceso.
-
-      <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn ghost" onclick="copyText(\`${supportMsg}\`)">
-          📋 Copiar mensaje para soporte
-        </button>
-      </div>
-    </div>
-  ` : "";
-
-  return `
-    <div class="resultTitle greenTitle">🧾 Revisión de cuenta</div>
-
-    <div class="line">📌 <span class="label2">Plataforma:</span> <b>${esc(res.platform || "")}</b></div>
-    <div class="line">📧 <span class="label2">Correo:</span> <b>${esc(res.email || "")}</b></div>
-    <div class="line">🔑 <span class="label2">Contraseña:</span> <b>${esc(res.password || "")}</b></div>
-
-    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-      <button class="btn ghost" onclick="copyText('${esc(res.password || "")}')">Copiar contraseña</button>
-      <button class="btn ghost" onclick="copyText('${esc(res.email || "")}')">Copiar correo</button>
-    </div>
-
-    ${maintenanceBlock}
-  `;
+/* =========================
+   CONFIG
+========================= */
+const API_BASE = "TU_WEBAPP_O_WORKER_URL";   // ejemplo: https://script.google.com/macros/s/.../exec
+const API_TOKEN = "CK.....6";                // si usas Worker, mejor que el Worker lo inyecte
+const WHATSAPP_NUMBER = "51904293916";
+const LOGO_URL = "assets/cards/Logo.png";
+
+const ICONOS = [
+  { name:"Netflix", icon:"assets/icons/Netflix.webp" },
+  { name:"Disney", icon:"assets/icons/Disney.webp" },
+  { name:"Spotify", icon:"assets/icons/Spotify.webp" },
+  { name:"YouTube", icon:"assets/icons/Youtube.webp" },
+  { name:"HBO MAX", icon:"assets/icons/HBOMAX.webp" },
+  { name:"Prime", icon:"assets/icons/PrimeVideo.webp" },
+  { name:"Crunchyroll", icon:"assets/icons/Crunchy.webp" },
+  { name:"DirecTV", icon:"assets/icons/DGO.webp" },
+  { name:"MovistarTV", icon:"assets/icons/MovistarTV.webp" },
+  { name:"Paramount", icon:"assets/icons/Paramount.webp" },
+  { name:"Vix", icon:"assets/icons/Vix.webp" },
+  { name:"Viki", icon:"assets/icons/Viki.webp" },
+  { name:"Deezer", icon:"assets/icons/Deezer.webp" },
+  { name:"CapCut", icon:"assets/icons/CapCut.webp" },
+  { name:"CHAT GPT", icon:"assets/icons/ChatGPT.webp" },
+  { name:"Canva", icon:"assets/icons/Canva.webp" },
+  { name:"Gemini", icon:"assets/icons/Gemini.webp" },
+  { name:"Apple Music", icon:"assets/icons/AppleMusic.webp" },
+  { name:"Apple TV", icon:"assets/icons/AppleTV.webp" },
+  { name:"VPN Surfshark", icon:"assets/icons/Surfshark.webp" },
+  { name:"Flujo TV", icon:"assets/icons/flujoTV.webp" },
+  { name:"Seguidores", icon:"assets/icons/RRSS.webp" },
+  { name:"Plex", icon:"assets/icons/Plex.webp" }
+];
+
+const RESTRICTED_KEYS = [
+  "NETFLIXPRO","DIRECTV","DGO","MOVISTAR","CANVAPRO","GEMINI",
+  "SPOTIFY","YTPREMIUM","PLEX","ANTIVIRUS"
+];
+
+const state = {
+  sessionToken: localStorage.getItem("ts_session_token") || "",
+  welcomeName: "",
+  initial: "",
+  accounts: [],
+  activeCodeRow: null,
+  activeCodeType: "",
+  activeCodeOption: "",
+  activeCodeMotivo: "",
+  codeAttempts: {},      // rowNumber -> remaining
+  codeStarted: {},       // rowNumber -> bool
+  retryTimers: {}        // rowNumber -> timeout end timestamp
+};
+
+/* =========================
+   HELPERS
+========================= */
+const $ = s => document.querySelector(s);
+
+function esc(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
+function setLogo(){
+  const logo = $("#logoImg");
+  if (LOGO_URL) logo.src = LOGO_URL;
+}
 
-  function renderSimpleWarn(title, msg){
+function apiPost(action, payload = {}) {
+  return fetch(`${API_BASE}?action=${encodeURIComponent(action)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: API_TOKEN,
+      deviceId: getDeviceId(),
+      ...payload
+    })
+  }).then(r => r.json());
+}
+
+function getDeviceId(){
+  const k = "ts_device_id";
+  let id = localStorage.getItem(k);
+  if(!id){
+    id = "dvc_" + Math.random().toString(36).slice(2) + "_" + Date.now().toString(36);
+    localStorage.setItem(k, id);
+  }
+  return id;
+}
+
+function showToast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => t.classList.remove("show"), 1400);
+}
+
+async function copyText(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast("✅ Copiado");
+  }catch(e){
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    showToast("✅ Copiado");
+  }
+}
+
+function maskEmail(email){
+  const e = String(email || "").trim();
+  const at = e.lastIndexOf("@");
+  if(at < 0) return e;
+  const user = e.slice(0, at);
+  const dom = e.slice(at);
+  if(user.length <= 2) return user + "***" + dom;
+  return `${user.slice(0,2)}***${user.slice(-1)}${dom}`;
+}
+
+function iconForPlatform(name){
+  const found = ICONOS.find(x => x.name.toLowerCase() === String(name || "").toLowerCase());
+  return found ? found.icon : "assets/icons/Default.webp";
+}
+
+function daysClass(daysLeft){
+  if(daysLeft === null || daysLeft === undefined || daysLeft === "") return "";
+  if(daysLeft <= 0) return "daysBad";
+  if(daysLeft <= 7) return "daysWarn";
+  return "daysOk";
+}
+
+function daysText(daysLeft){
+  if(daysLeft === null || daysLeft === undefined || daysLeft === "") return "Sin fecha";
+  if(daysLeft < 0) return "Vencido";
+  if(daysLeft === 0) return "Renueva hoy";
+  if(daysLeft === 1) return "Queda 1 día";
+  return `Quedan ${daysLeft} días`;
+}
+
+function amountText(v){
+  if (v === "" || v === null || v === undefined) return "—";
+  return `S/${Number(v).toFixed(2)}`;
+}
+
+function openModal(html){
+  $("#modalContent").innerHTML = html;
+  $("#modalBack").classList.add("show");
+}
+
+function closeModal(){
+  $("#modalBack").classList.remove("show");
+  $("#modalContent").innerHTML = "";
+  state.activeCodeRow = null;
+  state.activeCodeType = "";
+  state.activeCodeOption = "";
+  state.activeCodeMotivo = "";
+}
+
+function whatsappLink(message){
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+/* =========================
+   LOGIN
+========================= */
+function validateLogin(){
+  const phone = $("#loginPhone").value.trim();
+  const pin = $("#loginPin").value.trim();
+
+  let ok = true;
+
+  if (!phone){
+    $("#errLoginPhone").textContent = "⚠ Ingresa tu número de celular";
+    $("#loginPhone").classList.add("field-error");
+    ok = false;
+  } else {
+    $("#errLoginPhone").textContent = "";
+    $("#loginPhone").classList.remove("field-error");
+  }
+
+  if (!/^\d{4,5}$/.test(pin)){
+    $("#errLoginPin").textContent = "⚠ El PIN debe ser numérico de 4 o 5 dígitos";
+    $("#loginPin").classList.add("field-error");
+    ok = false;
+  } else {
+    $("#errLoginPin").textContent = "";
+    $("#loginPin").classList.remove("field-error");
+  }
+
+  $("#btnLogin").disabled = !ok;
+  return ok;
+}
+
+async function doLogin(){
+  if(!validateLogin()) return;
+
+  const status = $("#loginStatus");
+  status.classList.add("hidden");
+  status.innerHTML = "";
+
+  const data = await apiPost("login", {
+    phone: $("#loginPhone").value.trim(),
+    pin: $("#loginPin").value.trim()
+  });
+
+  if (!data.ok){
+    status.classList.remove("hidden");
+    status.innerHTML = `<div class="resultTitle" style="color:#ffb0b0">❌ No se pudo iniciar sesión</div><div>${esc(data.message || "Verifica tus datos.")}</div>`;
+    return;
+  }
+
+  state.sessionToken = data.sessionToken;
+  localStorage.setItem("ts_session_token", data.sessionToken);
+
+  await loadSessionAndAccounts();
+}
+
+/* =========================
+   SESSION + DASHBOARD
+========================= */
+async function loadSessionAndAccounts(){
+  if(!state.sessionToken){
+    showLogin();
+    return;
+  }
+
+  const s = await apiPost("session", { sessionToken: state.sessionToken });
+  if(!s.ok){
+    clearSession();
+    showLogin();
+    return;
+  }
+
+  state.welcomeName = s.welcomeName || "Cliente";
+  state.initial = s.initial || (state.welcomeName[0] || "U").toUpperCase();
+
+  const a = await apiPost("accounts", { sessionToken: state.sessionToken });
+  if(!a.ok){
+    clearSession();
+    showLogin();
+    return;
+  }
+
+  state.accounts = Array.isArray(a.accounts) ? a.accounts : [];
+  $("#userInitial").textContent = state.initial;
+  $("#userName").textContent = `Bienvenido, ${state.welcomeName}`;
+
+  renderCards();
+  showPortal();
+}
+
+function clearSession(){
+  localStorage.removeItem("ts_session_token");
+  state.sessionToken = "";
+}
+
+async function logout(){
+  if(state.sessionToken){
+    try { await apiPost("logout", { sessionToken: state.sessionToken }); } catch(e){}
+  }
+  clearSession();
+  showLogin();
+}
+
+function showLogin(){
+  $("#portalView").classList.add("hidden");
+  $("#loginView").classList.remove("hidden");
+}
+
+function showPortal(){
+  $("#loginView").classList.add("hidden");
+  $("#portalView").classList.remove("hidden");
+}
+
+function buildRenewMessage(acc){
+  return `*Hola TopStreaming 👋*\n_Quiero adelantar mi renovación._\n\n✅ Cuenta: *${acc.accountRaw}*\n✅ Perfil: ${acc.profile || "—"}\n💰 Monto: ${amountText(acc.amount)}\n📅 Fecha de renovación: ${acc.renewalDate || "—"}`;
+}
+
+function buildReportMessage(acc){
+  return `*Hola TopStreaming 👋*\n_Me aparece que mi cuenta está en mantenimiento y necesito soporte._\n\n✅ Cuenta: *${acc.accountRaw}*\n✅ Perfil: ${acc.profile || "—"}\n✅ PIN: ${acc.pin || "—"}`;
+}
+
+function renderCards(){
+  const grid = $("#cardsGrid");
+  if(!state.accounts.length){
+    grid.innerHTML = `<div class="card" style="padding:18px">No encontramos cuentas asociadas a tu sesión.</div>`;
+    return;
+  }
+
+  grid.innerHTML = state.accounts.map(acc => {
+    const icon = iconForPlatform(acc.platformDisplay);
+    const restricted = RESTRICTED_KEYS.includes(String(acc.platformKey || "").toUpperCase());
+
     return `
-      <div class="resultTitle yellowTitle">${esc(title)}</div>
-      <div style="color:rgba(234,240,255,.78); font-size:12.5px; line-height:1.35; white-space:pre-line;">
-        ${esc(msg)}
+      <div class="card accountCard">
+        <img class="cardTopImg" src="${esc(icon)}" alt="${esc(acc.platformDisplay)}" onerror="this.src='assets/icons/Default.webp'">
+        <div class="cardBody">
+          <h3 class="cardTitle">${esc(acc.platformDisplay)}</h3>
+          <div class="cardProfile">Perfil: <b>${esc(acc.profile || "—")}</b></div>
+
+          <div class="metaRow">
+            <div class="metaBox">
+              <div class="metaLabel">Monto</div>
+              <div class="metaValue">${esc(amountText(acc.amount))}</div>
+            </div>
+            <div class="metaBox">
+              <div class="metaLabel">Renovación</div>
+              <div class="metaValue ${daysClass(acc.daysLeft)}">${esc(daysText(acc.daysLeft))}</div>
+            </div>
+          </div>
+
+          <div class="smallInfo">
+            <div>Cuenta: <b>${esc(acc.accountRaw)}</b></div>
+            <div>Fecha de renovación: <b>${esc(acc.renewalDate || "—")}</b></div>
+          </div>
+
+          ${acc.maintenance ? `
+            <div class="maintenanceBox">
+              ⚠ <b>Cuenta en mantenimiento</b><br>
+              Esta cuenta requiere soporte para restablecer el acceso.
+            </div>
+          ` : ""}
+
+          <div class="actionsGrid">
+            <button class="btn btnGhost" onclick="openAccess(${acc.rowNumber})">Ver acceso</button>
+            ${acc.allowCode && !acc.maintenance ? `<button class="btn btnPrimary" onclick="openCodeModal(${acc.rowNumber})">Solicitar código</button>` : ``}
+            <button class="btn btnWarn ${acc.allowCode && !acc.maintenance ? "" : "full"}" onclick="window.open('${whatsappLink(buildRenewMessage(acc))}','_blank','noopener')">Renovar</button>
+            ${acc.maintenance ? `<button class="btn btnDanger full" onclick="window.open('${whatsappLink(buildReportMessage(acc))}','_blank','noopener')">Reportar problema</button>` : ``}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* =========================
+   ACCESS MODAL
+========================= */
+function openAccess(rowNumber){
+  const acc = state.accounts.find(x => Number(x.rowNumber) === Number(rowNumber));
+  if(!acc) return;
+
+  const restricted = RESTRICTED_KEYS.includes(String(acc.platformKey || "").toUpperCase());
+
+  if(restricted){
+    openModal(`
+      <button id="modalX" class="modalClose">✕</button>
+      <div class="modalTitle">Ver acceso</div>
+      <div class="modalSub">${esc(acc.platformDisplay)} · ${esc(acc.profile || "—")}</div>
+
+      <div class="resultBox">
+        <div class="resultTitle">Cuenta administrada por TopStreaming</div>
+        <div style="color:rgba(226,232,240,.84);font-size:14px;line-height:1.55">
+          Por seguridad, esta cuenta es gestionada directamente por nuestro sistema y no muestra datos de acceso en el portal.<br><br>
+          Si necesitas ayuda con tu cuenta, contáctanos por WhatsApp.
+        </div>
+      </div>
+
+      <div class="modalButtons">
+        <button class="btn btnPrimary" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda con mi cuenta.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Contactar soporte</button>
+      </div>
+    `);
+  } else {
+    openModal(`
+      <button id="modalX" class="modalClose">✕</button>
+      <div class="modalTitle">Ver acceso</div>
+      <div class="modalSub">${esc(acc.platformDisplay)} · ${esc(acc.profile || "—")}</div>
+
+      <div class="resultBox">
+        <div class="resultMeta">Correo</div>
+        <div style="font-size:18px;font-weight:1000">${esc(acc.email || "—")}</div>
+
+        <div class="resultMeta" style="margin-top:12px">Contraseña</div>
+        <div style="font-size:18px;font-weight:1000">${esc(acc.password || "—")}</div>
+      </div>
+
+      <div class="modalButtons">
+        <button class="btn btnGhost" onclick="copyText('${esc(acc.email || "")}')">Copiar correo</button>
+        <button class="btn btnGhost" onclick="copyText('${esc(acc.password || "")}')">Copiar contraseña</button>
+      </div>
+    `);
+  }
+
+  bindModalClose();
+}
+
+/* =========================
+   CODE MODAL
+========================= */
+function openCodeModal(rowNumber){
+  const acc = state.accounts.find(x => Number(x.rowNumber) === Number(rowNumber));
+  if(!acc) return;
+
+  state.activeCodeRow = rowNumber;
+  state.activeCodeType = String(acc.platformKey || "").toUpperCase();
+  state.activeCodeOption = "";
+  state.activeCodeMotivo = "";
+
+  const started = !!state.codeStarted[rowNumber];
+  const remaining = (typeof state.codeAttempts[rowNumber] === "number") ? state.codeAttempts[rowNumber] : 3;
+
+  const isNetflix = state.activeCodeType === "NETFLIX" || state.activeCodeType === "NETFLIXPRO";
+  const title = `Solicitar código ${isNetflix ? "Netflix" : "Disney+"}`;
+
+  const info = isNetflix
+    ? `
+      <div class="infoBox">
+        <b>⚠ Importante</b><br>
+        Presiona <b>Buscar código</b> solo después de haber dado a <b>Enviar email</b> en tu dispositivo.<br>
+        <b>No presiones Reenviar email.</b><br>
+        Si tienes inconvenientes para encontrar el código, escríbenos por <b>WhatsApp</b>.
+      </div>
+    `
+    : `
+      <div class="infoBox">
+        <b>⚠ Importante</b><br>
+        Usa esta opción solo cuando Disney+ ya te esté solicitando el <b>código de 6 dígitos</b>.<br>
+        <b>No presiones Reenviar código.</b><br>
+        Si tienes inconvenientes para encontrar el código, escríbenos por <b>WhatsApp</b>.
+      </div>
+    `;
+
+  const optionsHtml = isNetflix
+    ? `
+      <div class="modalSub">Selecciona la opción que te aparece en tu pantalla.</div>
+      <div class="optionGrid">
+        <button class="optionBtn" data-kind="option" data-value="viaje">Estoy de viaje</button>
+        <button class="optionBtn" data-kind="option" data-value="temporal">Ver temporalmente</button>
+        <button class="optionBtn" data-kind="option" data-value="hogar">Actualizar hogar</button>
+      </div>
+    `
+    : `
+      <div class="modalSub">Selecciona el motivo.</div>
+      <div class="optionGrid">
+        <button class="optionBtn" data-kind="motivo" data-value="Iniciar sesión (Celular/PC)">Iniciar sesión</button>
+        <button class="optionBtn" data-kind="motivo" data-value="Activar TV">Activar TV</button>
+        <button class="optionBtn" data-kind="motivo" data-value="Estoy fuera de casa">Estoy fuera de casa</button>
+      </div>
+    `;
+
+  openModal(`
+    <button id="modalX" class="modalClose">✕</button>
+    <div class="modalTitle">${esc(title)}</div>
+    <div class="modalSub">${esc(acc.platformDisplay)} · ${esc(acc.profile || "—")}</div>
+    ${info}
+    ${optionsHtml}
+
+    <div class="modalButtons">
+      <button id="btnSearchCode" class="btn btnPrimary" ${started ? "disabled" : "disabled"}>Buscar código</button>
+      <button id="btnRetryCode" class="btn btnGhost" disabled>Reintentar</button>
+    </div>
+
+    <div id="attemptsBox" class="attempts">Te quedan ${remaining} de 3</div>
+    <div id="codeLoader" class="loader">🔎 Buscando código...</div>
+    <div id="codeResult"></div>
+  `);
+
+  bindModalClose();
+
+  document.querySelectorAll("[data-kind]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-kind]").forEach(x => x.classList.remove("active"));
+      btn.classList.add("active");
+
+      if (btn.dataset.kind === "option") state.activeCodeOption = btn.dataset.value;
+      if (btn.dataset.kind === "motivo") state.activeCodeMotivo = btn.dataset.value;
+
+      if (!started) {
+        $("#btnSearchCode").disabled = !(state.activeCodeOption || state.activeCodeMotivo);
+      }
+    });
+  });
+
+  $("#btnSearchCode").onclick = () => runCodeSearch(false);
+  $("#btnRetryCode").onclick = () => runCodeSearch(true);
+
+  if(started){
+    $("#btnSearchCode").disabled = true;
+    handleRetryButton(rowNumber);
+  }
+}
+
+function handleRetryButton(rowNumber){
+  const btn = $("#btnRetryCode");
+  if(!btn) return;
+
+  const end = state.retryTimers[rowNumber] || 0;
+  const now = Date.now();
+
+  if(now >= end){
+    btn.disabled = false;
+    btn.textContent = "Reintentar";
+    return;
+  }
+
+  btn.disabled = true;
+
+  const tick = () => {
+    const left = end - Date.now();
+    if(left <= 0){
+      btn.disabled = false;
+      btn.textContent = "Reintentar";
+      return;
+    }
+    btn.textContent = `Reintentar (${Math.ceil(left/1000)}s)`;
+    requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+async function runCodeSearch(isRetry){
+  const rowNumber = state.activeCodeRow;
+  const acc = state.accounts.find(x => Number(x.rowNumber) === Number(rowNumber));
+  if(!acc) return;
+
+  const isNetflix = state.activeCodeType === "NETFLIX" || state.activeCodeType === "NETFLIXPRO";
+
+  if(isNetflix && !state.activeCodeOption) return;
+  if(!isNetflix && !state.activeCodeMotivo) return;
+
+  if(!isRetry){
+    state.codeStarted[rowNumber] = true;
+    $("#btnSearchCode").disabled = true;
+  }
+
+  $("#codeLoader").classList.add("show");
+  $("#codeResult").innerHTML = "";
+
+  const data = await apiPost("code", {
+    sessionToken: state.sessionToken,
+    rowNumber,
+    option: state.activeCodeOption,
+    motivo: state.activeCodeMotivo
+  });
+
+  $("#codeLoader").classList.remove("show");
+
+  if (typeof data.remaining === "number"){
+    state.codeAttempts[rowNumber] = data.remaining;
+    $("#attemptsBox").textContent = data.remaining > 0 ? `Te quedan ${data.remaining} de 3` : "Intentos agotados";
+  }
+
+  // Bloqueo
+  if (!data.ok && data.kind === "blocked"){
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffb0b0">❌ Acceso temporalmente bloqueado</div>
+        <div>${esc(data.message || "Intenta más tarde o contacta soporte.")}</div>
+      </div>
+      <div class="modalButtons">
+        <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para encontrar mi código.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">WhatsApp</button>
+      </div>
+    `;
+    $("#btnSearchCode").disabled = true;
+    $("#btnRetryCode").disabled = true;
+    return;
+  }
+
+  // Error genérico
+  if (!data.ok && data.kind !== "no_email"){
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffb0b0">❌ No se pudo completar</div>
+        <div>${esc(data.message || "Intenta nuevamente.")}</div>
+      </div>
+    `;
+    startRetryCooldown(rowNumber);
+    return;
+  }
+
+  // No llegó correo
+  if (!data.ok && data.kind === "no_email"){
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle">Aún no recibimos el correo</div>
+        <div class="resultMeta">Correo: <b>${esc(maskEmail(data.email || acc.email || ""))}</b></div>
+      </div>
+    `;
+    startRetryCooldown(rowNumber);
+    return;
+  }
+
+  // Expirado / válido
+  if (isNetflix){
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle">${esc(data.subject || "Tu código de acceso temporal de Netflix")}</div>
+        <div class="resultMeta">Correo: <b>${esc(maskEmail(data.email || acc.email || ""))}</b></div>
+        <div class="resultMeta">Hora: <b>${esc(data.timeText || "—")} (PET)</b></div>
+        ${data.kind === "expired" ? `
+          <div class="resultMeta" style="color:#ffe58a;margin-top:8px"><b>⚠ El enlace encontrado ya expiró.</b></div>
+        ` : `
+          <div class="resultLink">${esc(data.link || "")}</div>
+        `}
+      </div>
+      <div class="modalButtons">
+        ${data.kind === "valid" && data.link ? `<button class="btn btnPrimary" onclick="window.open('${esc(data.link)}','_blank','noopener')">Abrir enlace</button>` : ``}
+        ${data.kind === "valid" && data.link ? `<button class="btn btnGhost" onclick="copyText('${esc(data.link)}')">Copiar enlace</button>` : ``}
+      </div>
+    `;
+  } else {
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle">${esc(data.subject || "Tu código de acceso único para Disney+")}</div>
+        <div class="resultMeta">Correo: <b>${esc(maskEmail(data.email || acc.email || ""))}</b></div>
+        <div class="resultMeta">Hora: <b>${esc(data.timeText || "—")} (PET)</b></div>
+        ${data.kind === "expired" ? `
+          <div class="resultMeta" style="color:#ffe58a;margin-top:8px"><b>⚠ El código encontrado ya expiró.</b></div>
+        ` : `
+          <div class="resultCode">${esc(data.code || "")}</div>
+        `}
+      </div>
+      <div class="modalButtons">
+        ${data.kind === "valid" && data.code ? `<button class="btn btnPrimary" onclick="copyText('${esc(data.code)}')">Copiar código</button>` : ``}
       </div>
     `;
   }
 
-  // ---------- NETFLIX ----------
-  function searchNetflix(){ runNetflix(); }
-  function retryNetflix(){ runNetflix(); }
+  startRetryCooldown(rowNumber);
+}
 
-  async function runNetflix(){
-    // Marca touched para mostrar errores si intentan apretar
-    ["phoneNetflix","pinNetflix","opcionNetflix"].forEach(markTouched);
-    validateNetflix();
-    if (document.getElementById("btnSearchNetflix").disabled) return;
+function startRetryCooldown(rowNumber){
+  state.retryTimers[rowNumber] = Date.now() + 30000;
+  $("#btnSearchCode").disabled = true;
+  handleRetryButton(rowNumber);
+}
 
-    startCooldown("netflix", ["btnSearchNetflix","btnRetryNetflix"], 30, "btnRetryNetflix");
+/* =========================
+   MODAL CLOSE
+========================= */
+function bindModalClose(){
+  $("#modalX")?.addEventListener("click", closeModal);
+}
 
-    const phone = document.getElementById("phoneNetflix").value.trim();
-    const pin = document.getElementById("pinNetflix").value.trim();
-    const opcion = document.getElementById("opcionNetflix").value;
+$("#modalClose").addEventListener("click", closeModal);
+$("#modalBack").addEventListener("click", (e) => {
+  if (e.target.id === "modalBack") closeModal();
+});
 
-    outHTML("outNetflix", "");
-    setLoader("loaderNetflix", true);
+/* =========================
+   EVENTS
+========================= */
+$("#btnLogin").addEventListener("click", doLogin);
+$("#loginPhone").addEventListener("input", validateLogin);
+$("#loginPin").addEventListener("input", () => {
+  $("#loginPin").value = $("#loginPin").value.replace(/[^\d]/g, "");
+  validateLogin();
+});
+$("#btnLogout").addEventListener("click", logout);
 
-    // Simulación front para Actualizar hogar
-    if (opcion === "hogar") {
-      setTimeout(() => {
-        setLoader("loaderNetflix", false);
-        outHTML("outNetflix", renderSimpleWarn("🏠 Actualizar hogar (Netflix)", UPDATE_HOME_MESSAGE));
-      }, 1200);
-      return;
-    }
+/* =========================
+   INIT
+========================= */
+(async function init(){
+  setLogo();
+  validateLogin();
 
-    try{
-      const res = await fetch(`${API_BASE}/api/portal/netflix`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId: getDeviceId(), phone, pin })
-      });
-      const data = await res.json();
-
-      setLoader("loaderNetflix", false);
-      if(typeof data.remaining === "number") setRemain("remainNetflix", data.remaining);
-
-      if(data.ok && (data.kind === "valid" || data.kind === "expired")){
-        outHTML("outNetflix", renderNetflix(data));
-        return;
-      }
-
-      if(data && data.kind === "no_email"){
-        outHTML("outNetflix", renderNetflix({ kind:"no_email", email: data.email || "" }));
-        return;
-      }
-
-      outHTML("outNetflix", renderError("No se pudo completar", data.message || "Intenta nuevamente."));
-    }catch(e){
-      setLoader("loaderNetflix", false);
-      outHTML("outNetflix", renderError("Error de conexión", "Intenta nuevamente."));
-    }
+  if(state.sessionToken){
+    await loadSessionAndAccounts();
+  }else{
+    showLogin();
   }
-
-  // ---------- DISNEY ----------
-  function searchDisney(){ runDisney(); }
-  function retryDisney(){ runDisney(); }
-
-  async function runDisney(){
-    ["phoneDisney","pinDisney","motivoDisney"].forEach(markTouched);
-    validateDisney();
-    if (document.getElementById("btnSearchDisney").disabled) return;
-
-    startCooldown("disney", ["btnSearchDisney","btnRetryDisney"], 30, "btnRetryDisney");
-
-    const phone = document.getElementById("phoneDisney").value.trim();
-    const pin = document.getElementById("pinDisney").value.trim();
-    const motivo = document.getElementById("motivoDisney").value;
-
-    outHTML("outDisney", "");
-    setLoader("loaderDisney", true);
-
-    try{
-      const res = await fetch(`${API_BASE}/api/portal/disney`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId: getDeviceId(), phone, pin, motivo })
-      });
-      const data = await res.json();
-
-      setLoader("loaderDisney", false);
-      if(typeof data.remaining === "number") setRemain("remainDisney", data.remaining);
-
-      if(data.ok && (data.kind === "valid" || data.kind === "expired")){
-        outHTML("outDisney", renderDisney(data));
-        return;
-      }
-
-      if(data && (data.kind === "domain_not_supported" || data.kind === "no_email")){
-        outHTML("outDisney", renderDisney(data));
-        return;
-      }
-
-      outHTML("outDisney", renderError("No se pudo completar", data.message || "Intenta nuevamente."));
-    }catch(e){
-      setLoader("loaderDisney", false);
-      outHTML("outDisney", renderError("Error de conexión", "Intenta nuevamente."));
-    }
-  }
-
-  // ---------- ACCOUNT ----------
-  async function checkAccount(){
-    ["phoneAccount","platform"].forEach(markTouched);
-    validateAccount();
-    if (document.getElementById("btnAccount").disabled) return;
-
-    startCooldown("account", ["btnAccount"], 10, null);
-
-    const phone = document.getElementById("phoneAccount").value.trim();
-    const platform = document.getElementById("platform").value;
-
-    outHTML("outAccount", "");
-    setLoader("loaderAccount", true);
-
-    try{
-      const res = await fetch(`${API_BASE}/api/portal/account`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId: getDeviceId(), phone, platform })
-      });
-      const data = await res.json();
-
-      setLoader("loaderAccount", false);
-      if(typeof data.remaining === "number") setRemain("remainAccount", data.remaining);
-
-      if(data.ok && data.kind === "found"){
-        outHTML("outAccount", renderAccount(data));
-        return;
-      }
-
-      outHTML("outAccount", renderError("No se encontró información", data.message || "Verifica los datos."));
-    }catch(e){
-      setLoader("loaderAccount", false);
-      outHTML("outAccount", renderError("Error de conexión", "Intenta nuevamente."));
-    }
-  }
-
-    // Bottom nav móvil
-  document.getElementById("bnProductos")?.addEventListener("click", () => {
-    window.location.href = "index.html";
-  });
-
-  document.getElementById("bnCuentas")?.addEventListener("click", () => {
-    window.location.href = "portal.html";
-  });
-
-  document.getElementById("bnPeliculas")?.addEventListener("click", () => {
-    window.open("https://www.justwatch.com/pe", "_blank", "noopener");
-  });
-
-  document.getElementById("bnContacto")?.addEventListener("click", () => {
-    window.open("https://wa.link/fzemlu", "_blank", "noopener");
-  });
-  
-  (function init(){
-    // Platform select placeholder + options
-    const sel = document.getElementById("platform");
-    sel.innerHTML = "";
-
-    const ph = document.createElement("option");
-    ph.value = "";
-    ph.textContent = "Seleccionar plataforma…";
-    ph.disabled = true;
-    ph.selected = true;
-    sel.appendChild(ph);
-
-    PLATFORMS.forEach(p => {
-      const o = document.createElement("option");
-      o.value = p;
-      o.textContent = p;
-      sel.appendChild(o);
-    });
-
-    setRemain("remainNetflix", null);
-    setRemain("remainDisney", null);
-    setRemain("remainAccount", null);
-
-    // Wire touched + validation realtime
-    [
-      "phoneNetflix","pinNetflix","opcionNetflix",
-      "phoneDisney","pinDisney","motivoDisney",
-      "phoneAccount","platform"
-    ].forEach(wireTouched);
-
-    // Estado inicial (botones deshabilitados)
-    validateAll();
-  })();
+})();
 </script>
 </body>
 </html>
