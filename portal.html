@@ -759,7 +759,7 @@
         <div class="portalHeadLeft">
           <div id="userInitial" class="avatarBubble">R</div>
           <div>
-            <div id="userName" class="headName">Bienvenido, Ruru</div>
+            <div id="userName" class="headName">Bienvenid@, Ruru</div>
             <div class="headSub">Cliente TopStreaming</div>
           </div>
         </div>
@@ -1104,7 +1104,7 @@ async function loadSessionAndAccounts(){
 
   state.accounts = Array.isArray(a.accounts) ? a.accounts : [];
   $("#userInitial").textContent = state.initial;
-  $("#userName").textContent = `Bienvenido, ${state.welcomeName}`;
+  $("#userName").textContent = `Bienvenid@, ${state.welcomeName}`;
 
   renderCards();
   showPortal();
@@ -1137,7 +1137,7 @@ function showBoot(){
 
 function showLogin(){
   hideBoot();
-  $("#desktopTopNav")?.classList.add("hidden");
+  $("#desktopTopNav")?.classList.remove("hidden");
   $("#portalView").classList.add("hidden");
   $("#loginView").classList.remove("hidden");
 }
