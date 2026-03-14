@@ -520,6 +520,108 @@
   color:#94a3b8;
 }
 
+.desktopTopNav{
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  display: none;
+  background: rgba(5,8,18,.94);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(10px);
+}
+
+.desktopTopNav-inner{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.desktopBrand{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.desktopBrand-logo{
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  padding: 6px;
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.desktopBrand-title{
+  font-size: 18px;
+  font-weight: 1000;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.desktopBrand-sub{
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.desktopNavActions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.desktopNavBtn{
+  border: 1px solid rgba(56,189,248,.20);
+  background: rgba(18,26,38,.85);
+  color: #fff;
+  border-radius: 14px;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 1000;
+  cursor: pointer;
+  transition: .18s ease;
+  white-space: nowrap;
+}
+
+.desktopNavBtn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(56,189,248,.45);
+}
+
+.desktopNavBtn.active{
+  background: linear-gradient(180deg, rgba(34,197,94,.18), rgba(34,197,94,.08));
+  border-color: rgba(34,197,94,.42);
+}
+
+.desktopNavBtn.whatsapp{
+  background: linear-gradient(180deg, rgba(34,197,94,.20), rgba(34,197,94,.10));
+  border-color: rgba(34,197,94,.42);
+}
+
+.desktopNavBtn.ghost{
+  background: rgba(255,255,255,.04);
+  border-color: rgba(255,255,255,.10);
+}
+
+@media (min-width: 721px){
+  .desktopTopNav{
+    display: block;
+  }
+
+  .wrap{
+    padding-top: 18px;
+  }
+}
+
     
     .bottomNav{
   position: fixed;
@@ -591,6 +693,28 @@
     </div>
   </section>
 
+  <!-- DESKTOP TOP NAV SOLO PC -->
+  <header id="desktopTopNav" class="desktopTopNav hidden">
+    <div class="desktopTopNav-inner">
+      <div class="desktopBrand" id="desktopBrand">
+        <img id="desktopBrandLogo" alt="TopStreaming" class="desktopBrand-logo">
+        <div class="desktopBrand-texts">
+          <div class="desktopBrand-title">TopStreaming</div>
+          <div class="desktopBrand-sub">Planes, cuentas y servicios disponibles.</div>
+        </div>
+      </div>
+
+      <div class="desktopNavActions">
+        <button class="desktopNavBtn" id="dtProductos">🛍 Productos</button>
+        <button class="desktopNavBtn active" id="dtCuentas">👤 Mis cuentas</button>
+        <button class="desktopNavBtn" id="dtPeliculas">🍿 Buscar película</button>
+        <button class="desktopNavBtn whatsapp" id="dtWhatsapp">🟢 WhatsApp</button>
+        <button class="desktopNavBtn ghost" id="dtActualizar">🔄 Actualizar</button>
+      </div>
+    </div>
+  </header>
+
+  
   <div class="wrap">
 
     <!-- LOGIN -->
@@ -749,10 +873,12 @@ function esc(s){
 function setLogo(){
   const logo = $("#logoImg");
   const bootLogo = $("#bootLogo");
+  const desktopBrandLogo = $("#desktopBrandLogo");
 
   if (LOGO_URL) {
     if (logo) logo.src = LOGO_URL;
     if (bootLogo) bootLogo.src = LOGO_URL;
+    if (desktopBrandLogo) desktopBrandLogo.src = LOGO_URL;
   }
 }
 
@@ -1004,18 +1130,21 @@ function hideBoot(){
 
 function showBoot(){
   $("#bootView")?.classList.remove("hidden");
+  $("#desktopTopNav")?.classList.add("hidden");
   $("#loginView").classList.add("hidden");
   $("#portalView").classList.add("hidden");
 }
 
 function showLogin(){
   hideBoot();
+  $("#desktopTopNav")?.classList.add("hidden");
   $("#portalView").classList.add("hidden");
   $("#loginView").classList.remove("hidden");
 }
 
 function showPortal(){
   hideBoot();
+  $("#desktopTopNav")?.classList.remove("hidden");
   $("#loginView").classList.add("hidden");
   $("#portalView").classList.remove("hidden");
 }
@@ -1445,6 +1574,47 @@ document.getElementById("bnPeliculas")?.addEventListener("click", () => {
 document.getElementById("bnContacto")?.addEventListener("click", () => {
   window.open("https://wa.link/fzemlu", "_blank", "noopener");
 });
+
+  document.getElementById("dtProductos")?.addEventListener("click", () => {
+  window.location.href = "index.html";
+});
+
+document.getElementById("dtCuentas")?.addEventListener("click", async () => {
+  if (state.sessionToken) {
+    showBoot();
+    try{
+      await loadSessionAndAccounts();
+    }catch(e){
+      clearSession();
+      showLogin();
+    }
+  } else {
+    showLogin();
+  }
+});
+
+document.getElementById("dtPeliculas")?.addEventListener("click", () => {
+  window.open("https://www.justwatch.com/pe", "_blank", "noopener");
+});
+
+document.getElementById("dtWhatsapp")?.addEventListener("click", () => {
+  window.open("https://wa.link/fzemlu", "_blank", "noopener");
+});
+
+document.getElementById("dtActualizar")?.addEventListener("click", async () => {
+  if (state.sessionToken) {
+    showBoot();
+    try{
+      await loadSessionAndAccounts();
+    }catch(e){
+      clearSession();
+      showLogin();
+    }
+  } else {
+    window.location.reload();
+  }
+});
+
   
   (async function init(){
   setLogo();
