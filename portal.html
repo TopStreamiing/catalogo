@@ -827,7 +827,7 @@ function daysClass(daysLeft, showDays){
 function daysText(daysLeft, showDays, renewalDate){
   if (!renewalDate) return "Sin fecha";
   if (!showDays) {
-    return `Renovación ${renewalDate}`;
+    return `${renewalDate}`;
   }
   if (daysLeft === 0) return "Renueva hoy";
   if (daysLeft === 1) return "Queda 1 día";
