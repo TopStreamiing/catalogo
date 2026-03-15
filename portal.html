@@ -1059,6 +1059,10 @@ function openModal(html){
 }
 
 function closeModal(){
+  if (state.activeCodeRow !== null) {
+    state.codeStarted[state.activeCodeRow] = false;
+  }
+
   $("#modalBack").classList.remove("show");
   $("#modalContent").innerHTML = "";
   state.activeCodeRow = null;
@@ -1238,7 +1242,20 @@ async function refreshAccountsBackground(){
   try{
     const a = await apiPost("accounts",{sessionToken:state.sessionToken});
     if(!a.ok) return;
+
     state.accounts = Array.isArray(a.accounts) ? a.accounts : [];
+
+    // actualiza también el cache visible, sin guardar correo/contraseña
+    savePanelCache({
+      welcomeName: state.welcomeName,
+      initial: state.initial,
+      accounts: state.accounts.map(acc => ({
+        ...acc,
+        email: "",
+        password: ""
+      }))
+    });
+
   }catch(e){}
 }
   
@@ -1397,7 +1414,12 @@ function openSupportModal(rowNumber){
         <div style="font-size:13px;color:rgba(226,232,240,.78);margin-bottom:10px;">
           Detalla el problema que estás experimentando
         </div>
-        <textarea id="supportOtherText" placeholder="Escribe aquí el inconveniente..." style="width:100%;min-height:120px;resize:vertical;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(15,22,36,.55);color:var(--text);padding:12px 14px;font-size:14px;outline:none;"></textarea>
+
+        <textarea
+          id="supportOtherText"
+          placeholder="Escribe aquí el inconveniente..."
+          style="width:100%;min-height:120px;resize:vertical;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(15,22,36,.55);color:var(--text);padding:12px 14px;font-size:14px;outline:none;"
+        ></textarea>
 
         <div class="modalButtons">
           <button id="btnSupportSend" class="btn btnPrimary">Enviar ahora</button>
@@ -1413,7 +1435,6 @@ function openSupportModal(rowNumber){
     btn.addEventListener("click", () => {
       const issue = btn.dataset.support || "";
 
-      // Opciones directas
       if (issue && issue !== "Otro") {
         window.open(
           whatsappLink(buildSupportMessage(acc, issue)),
@@ -1424,7 +1445,6 @@ function openSupportModal(rowNumber){
         return;
       }
 
-      // Otro
       if (issue === "Otro") {
         document.getElementById("supportOtherWrap")?.classList.remove("hidden");
         document.querySelectorAll("[data-support]").forEach(x => x.classList.remove("active"));
@@ -1513,9 +1533,11 @@ function openCodeModal(rowNumber){
   state.activeCodeOption = "";
   state.activeCodeMotivo = "";
 
-  const started = !!state.codeStarted[rowNumber];
-  const remaining = (typeof state.codeAttempts[rowNumber] === "number") ? state.codeAttempts[rowNumber] : 3;
+  // Cada vez que abras el modal, arranca limpio
+  state.codeStarted[rowNumber] = false;
 
+  const started = false;
+  const remaining = (typeof state.codeAttempts[rowNumber] === "number") ? state.codeAttempts[rowNumber] : 3;
   const isNetflix = state.activeCodeType === "NETFLIX" || state.activeCodeType === "NETFLIXPRO";
   const title = `Solicitar código ${isNetflix ? "Netflix" : "Disney+"}`;
 
@@ -1563,7 +1585,7 @@ function openCodeModal(rowNumber){
     ${optionsHtml}
 
     <div class="modalButtons">
-      <button id="btnSearchCode" class="btn btnPrimary" ${started ? "disabled" : "disabled"}>Buscar código</button>
+      <button id="btnSearchCode" class="btn btnPrimary" disabled>Buscar código</button>
       <button id="btnRetryCode" class="btn btnGhost" disabled>Reintentar</button>
     </div>
 
