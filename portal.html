@@ -1167,8 +1167,13 @@ function buildRenewMessage(acc){
 }
 
 function buildReportMessage(acc){
-  return `*Hola TopStreaming 👋*\n_Me aparece que mi cuenta está en mantenimiento y necesito soporte._\n\n✅ Cuenta: *${acc.accountRaw}*\n✅ Perfil: ${acc.profile || "—"}\n✅ PIN: ${acc.pin || "—"}`;
+  return `*Hola TopStreaming 👋*\n\nNecesito soporte con mi cuenta en mantenimiento.\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n✅ Correo: ${acc.email || "—"}\n✅ Perfil: ${acc.profile || "—"}\n✅ Inconveniente: Cuenta en mantenimiento\n\nAgradecería su ayuda para revisarlo.`;
 }
+
+function buildSupportMessage(acc, issueText){
+  return `*Hola TopStreaming 👋*\n\nNecesito soporte con mi cuenta:\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n✅ Correo: ${acc.email || "—"}\n✅ Perfil: ${acc.profile || "—"}\n✅ Inconveniente: ${issueText || "—"}\n\nAgradecería su ayuda para revisarlo.`;
+}
+  
 function buildManualCodeSupportMessage(acc){
   return `*Hola TopStreaming 👋*\n\nEstoy solicitando un código desde el portal de clientes, pero el sistema indica que este correo no está habilitado para búsqueda automática.\n\n📺 Cuenta: *${acc.accountRaw || "—"}*\n👤 Perfil: ${acc.profile || "—"}\n📧 Correo detectado: ${acc.email || "—"}\n🧩 Plataforma: ${acc.platformDisplay || acc.platformKey || "—"}\n\n¿Podrían ayudarme a obtener el código de acceso?\n\nGracias.`;
 }
@@ -1218,7 +1223,7 @@ function renderCards(){
             <button class="btn btnGhost" onclick="openAccess(${acc.rowNumber})">Ver acceso</button>
             ${acc.allowCode && !acc.maintenance ? `<button class="btn btnPrimary" onclick="openCodeModal(${acc.rowNumber})">Solicitar código</button>` : ``}
             <button class="btn btnWarn ${acc.allowCode && !acc.maintenance ? "" : "full"}" onclick="window.open('${whatsappLink(buildRenewMessage(acc))}','_blank','noopener')">Renovar</button>
-            ${acc.maintenance ? `<button class="btn btnDanger full" onclick="window.open('${whatsappLink(buildReportMessage(acc))}','_blank','noopener')">Reportar problema</button>` : ``}
+            <button class="btn btnDanger full" onclick="openSupportModal(${acc.rowNumber})">Reportar problema</button>
           </div>
         </div>
       </div>
@@ -1226,6 +1231,97 @@ function renderCards(){
   }).join("");
 }
 
+
+  
+function openSupportModal(rowNumber){
+  const acc = state.accounts.find(x => Number(x.rowNumber) === Number(rowNumber));
+  if(!acc) return;
+
+  // Si está en mantenimiento: directo a WhatsApp
+  if (acc.maintenance) {
+    window.open(
+      whatsappLink(buildReportMessage(acc)),
+      "_blank",
+      "noopener"
+    );
+    return;
+  }
+
+  openModal(`
+    <button id="modalX" class="modalClose">✕</button>
+    <div class="modalTitle">Solicitar soporte</div>
+    <div class="modalSub">${esc(acc.platformDisplay)} · ${esc(acc.profile || "—")}</div>
+
+    <div class="resultBox">
+      <div style="font-size:14px;color:rgba(226,232,240,.84);line-height:1.55;margin-bottom:12px;">
+        Selecciona el problema que estás presentando con tu cuenta.
+      </div>
+
+      <div class="optionGrid" id="supportOptions">
+        <button class="optionBtn" data-support="Error de contraseña">Error de contraseña</button>
+        <button class="optionBtn" data-support="No es plan premium">No es plan premium</button>
+        <button class="optionBtn" data-support="No aparece mi perfil">No aparece mi perfil</button>
+        <button class="optionBtn" data-support="Otro">Otro</button>
+      </div>
+
+      <div id="supportOtherWrap" class="hidden" style="margin-top:14px;">
+        <div style="font-size:18px;font-weight:1000;margin-bottom:8px;">Solicitar soporte</div>
+        <div style="font-size:13px;color:rgba(226,232,240,.78);margin-bottom:10px;">
+          Detalla el problema que estás experimentando
+        </div>
+        <textarea id="supportOtherText" placeholder="Escribe aquí el inconveniente..." style="width:100%;min-height:120px;resize:vertical;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(15,22,36,.55);color:var(--text);padding:12px 14px;font-size:14px;outline:none;"></textarea>
+
+        <div class="modalButtons">
+          <button id="btnSupportSend" class="btn btnPrimary">Enviar ahora</button>
+          <button id="btnSupportCancel" class="btn btnGhost">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  `);
+
+  bindModalClose();
+
+  document.querySelectorAll("[data-support]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const issue = btn.dataset.support || "";
+
+      // Opciones directas
+      if (issue && issue !== "Otro") {
+        window.open(
+          whatsappLink(buildSupportMessage(acc, issue)),
+          "_blank",
+          "noopener"
+        );
+        closeModal();
+        return;
+      }
+
+      // Otro
+      if (issue === "Otro") {
+        document.getElementById("supportOtherWrap")?.classList.remove("hidden");
+        document.querySelectorAll("[data-support]").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+      }
+    });
+  });
+
+  document.getElementById("btnSupportCancel")?.addEventListener("click", () => {
+    closeModal();
+  });
+
+  document.getElementById("btnSupportSend")?.addEventListener("click", () => {
+    const txt = document.getElementById("supportOtherText")?.value?.trim() || "";
+    if (!txt) return;
+
+    window.open(
+      whatsappLink(buildSupportMessage(acc, txt)),
+      "_blank",
+      "noopener"
+    );
+    closeModal();
+  });
+}
+  
 /* =========================
    ACCESS MODAL
 ========================= */
