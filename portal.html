@@ -1409,6 +1409,7 @@ async function runCodeSearch(isRetry){
 
   const data = await apiPost("code", {
   sessionToken: state.sessionToken,
+  phone: $("#loginPhone")?.value?.trim() || "",
   email: acc.email || "",
   platformKey: acc.platformKey || "",
   accountRaw: acc.accountRaw || "",
