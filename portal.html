@@ -246,7 +246,18 @@ body.login-bg{
     }
 
     
-    .cardTopImg{
+    .cardBody{
+  padding:22px;
+}
+
+.cardHead{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:14px;
+}
+
+.cardTopImg{
   width:72px;
   height:72px;
   object-fit:contain;
@@ -255,24 +266,53 @@ body.login-bg{
   background:rgba(255,255,255,.06);
   border:1px solid rgba(255,255,255,.08);
   box-shadow:0 6px 18px rgba(0,0,0,.35);
-  margin-bottom:10px;
+  flex:0 0 auto;
 }
 
-    
-    .cardBody{
-      padding:18px;
-    }
-    .cardTitle{
-      font-size:20px;
-      font-weight:1000;
-      margin:0;
-    }
-    .cardProfile{
-      margin-top:6px;
-      color:var(--muted);
-      font-weight:800;
-      font-size:13px;
-    }
+.cardHeadText{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.cardTitle{
+  font-size:20px;
+  font-weight:1000;
+  margin:0;
+  line-height:1.15;
+}
+
+.cardProfile{
+  margin-top:6px;
+  color:var(--muted);
+  font-weight:800;
+  font-size:13px;
+  line-height:1.2;
+}
+
+.maintenanceMini{
+  margin-top:10px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(250,204,21,.12);
+  border:1px solid rgba(250,204,21,.34);
+  color:#ffe58a;
+  font-size:12px;
+  font-weight:1000;
+  width:max-content;
+  max-width:100%;
+}
+
+.cardDivider{
+  height:1px;
+  width:100%;
+  background:rgba(255,255,255,.08);
+  margin:16px 0 16px;
+}
 
     .metaRow{
       display:grid;
@@ -1198,12 +1238,21 @@ function renderCards(){
 
     return `
       <div class="card accountCard">
-        <img class="cardTopImg" src="${esc(icon)}" alt="${esc(acc.platformDisplay)}" onerror="this.src='assets/icons/Default.webp'">
-        <div class="cardBody">
-          <h3 class="cardTitle">${esc(acc.platformDisplay)}</h3>
-          <div class="cardProfile">Perfil: <b>${esc(acc.profile || "—")}</b></div>
+  <div class="cardBody">
 
-          <div class="metaRow">
+    <div class="cardHead">
+      <img class="cardTopImg" src="${esc(icon)}" alt="${esc(acc.platformDisplay)}" onerror="this.src='assets/icons/Default.webp'">
+
+      <div class="cardHeadText">
+        <h3 class="cardTitle">${esc(acc.platformDisplay)}</h3>
+        <div class="cardProfile">Perfil: <b>${esc(acc.profile || "—")}</b></div>
+        ${acc.maintenance ? `<div class="maintenanceMini">⚠ Cuenta en mantenimiento</div>` : ``}
+      </div>
+    </div>
+
+    <div class="cardDivider"></div>
+
+    <div class="metaRow">
             <div class="metaBox">
               <div class="metaLabel">Monto</div>
               <div class="metaValue">${esc(amountText(acc.amount))}</div>
@@ -1219,12 +1268,7 @@ function renderCards(){
             <div>Fecha de renovación: <b>${esc(acc.renewalDate || "—")}</b></div>
           </div>
 
-          ${acc.maintenance ? `
-            <div class="maintenanceBox">
-              ⚠ <b>Cuenta en mantenimiento</b><br>
-              Esta cuenta requiere soporte para restablecer el acceso.
-            </div>
-          ` : ""}
+        
 
           <div class="actionsGrid">
             <button class="btn btnGhost" onclick="openAccess(${acc.rowNumber})">Datos de acceso</button>
