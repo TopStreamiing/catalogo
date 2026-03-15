@@ -908,7 +908,9 @@ const state = {
   activeCodeMotivo: "",
   codeAttempts: {},      // rowNumber -> remaining
   codeStarted: {},       // rowNumber -> bool
-  retryTimers: {}        // rowNumber -> timeout end timestamp
+  retryTimers: {},
+  cacheLoaded:false,
+  cacheExpire:0
 };
 
 /* =========================
@@ -959,6 +961,37 @@ function getDeviceId(){
   return id;
 }
 
+function getCacheExpire(){
+  const now = new Date();
+  const expire = new Date();
+  expire.setHours(23,59,0,0);
+  return expire.getTime();
+}
+
+function savePanelCache(data){
+  const cache = {
+    expire:getCacheExpire(),
+    data:data
+  };
+  localStorage.setItem("ts_panel_cache",JSON.stringify(cache));
+}
+
+function loadPanelCache(){
+  const raw = localStorage.getItem("ts_panel_cache");
+  if(!raw) return null;
+
+  try{
+    const cache = JSON.parse(raw);
+    if(Date.now() > cache.expire){
+      localStorage.removeItem("ts_panel_cache");
+      return null;
+    }
+    return cache.data;
+  }catch(e){
+    return null;
+  }
+}
+  
 function showToast(msg){
   const t = $("#toast");
   t.textContent = msg;
@@ -1136,6 +1169,26 @@ async function doLogin(){
    SESSION + DASHBOARD
 ========================= */
 async function loadSessionAndAccounts(){
+  const cache = loadPanelCache();
+
+if(cache && state.sessionToken){
+  state.welcomeName = cache.welcomeName;
+  state.initial = cache.initial;
+  state.accounts = cache.accounts;
+
+  $("#userInitial").textContent = state.initial;
+  $("#userName").textContent = `Bienvenido, ${state.welcomeName}`;
+
+  renderCards();
+  showPortal();
+
+  state.cacheLoaded = true;
+
+  // cargar datos sensibles en segundo plano
+  refreshAccountsBackground();
+  return;
+}
+  
   if(!state.sessionToken){
     showLogin();
     return;
@@ -1159,6 +1212,15 @@ async function loadSessionAndAccounts(){
   }
 
   state.accounts = Array.isArray(a.accounts) ? a.accounts : [];
+  savePanelCache({
+  welcomeName:state.welcomeName,
+  initial:state.initial,
+  accounts:state.accounts.map(acc=>({
+    ...acc,
+    email:"",
+    password:""
+  }))
+});
   $("#userInitial").textContent = state.initial;
   $("#userName").textContent = `Bienvenid@, ${state.welcomeName}`;
 
@@ -1168,10 +1230,18 @@ async function loadSessionAndAccounts(){
 
 function clearSession(){
   localStorage.removeItem("ts_session_token");
+  localStorage.removeItem("ts_panel_cache");
   state.sessionToken = "";
-  state.accounts = [];
 }
 
+async function refreshAccountsBackground(){
+  try{
+    const a = await apiPost("accounts",{sessionToken:state.sessionToken});
+    if(!a.ok) return;
+    state.accounts = Array.isArray(a.accounts) ? a.accounts : [];
+  }catch(e){}
+}
+  
 async function logout(){
   if(state.sessionToken){
     try { await apiPost("logout", { sessionToken: state.sessionToken }); } catch(e){}
