@@ -1280,7 +1280,7 @@ function renderCards(){
 Solicitar código
 </button>
 
-            <button class="btn btnWarn ${acc.allowCode && !acc.maintenance ? "" : "full"}" onclick="window.open('${whatsappLink(buildRenewMessage(acc))}','_blank','noopener')">Renovar</button>
+            <button class="btn btnWarn full" onclick="window.open('${whatsappLink(buildRenewMessage(acc))}','_blank','noopener')">Renovar</button>
             <button class="btn btnDanger full" onclick="openSupportModal(${acc.rowNumber})">Reportar problema</button>
           </div>
         </div>
