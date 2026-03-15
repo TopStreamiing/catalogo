@@ -980,7 +980,8 @@ function closeModal(){
 }
 
 function whatsappLink(message){
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  const clean = String(message || "").normalize("NFC");
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(clean)}`;
 }
 
 /* =========================
