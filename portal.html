@@ -1157,7 +1157,10 @@ function buildRenewMessage(acc){
 function buildReportMessage(acc){
   return `*Hola TopStreaming 👋*\n_Me aparece que mi cuenta está en mantenimiento y necesito soporte._\n\n✅ Cuenta: *${acc.accountRaw}*\n✅ Perfil: ${acc.profile || "—"}\n✅ PIN: ${acc.pin || "—"}`;
 }
-
+function buildManualCodeSupportMessage(acc){
+  return `*Hola TopStreaming 👋*\n\nEstoy solicitando un código desde el portal de clientes, pero el sistema indica que este correo no está habilitado para búsqueda automática.\n\n📺 Cuenta: *${acc.accountRaw || "—"}*\n👤 Perfil: ${acc.profile || "—"}\n📧 Correo detectado: ${acc.email || "—"}\n🧩 Plataforma: ${acc.platformDisplay || acc.platformKey || "—"}\n\n¿Podrían ayudarme a obtener el código de acceso?\n\nGracias.`;
+}
+  
 function renderCards(){
   const grid = $("#cardsGrid");
   if(!state.accounts.length){
@@ -1438,6 +1441,34 @@ async function runCodeSearch(isRetry){
     return;
   }
 
+    // Soporte manual por dominio no permitido
+  if (!data.ok && data.kind === "manual_support"){
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffe58a">🔒 Búsqueda automática no disponible</div>
+        <div style="color:rgba(226,232,240,.84);font-size:14px;line-height:1.55">
+          ⚠️ <b>Este correo no está habilitado para búsqueda automática de códigos desde el portal.</b><br><br>
+          El sistema detectó que el código debe ser gestionado manualmente por nuestro equipo de soporte.<br><br>
+          <b>Cuenta:</b> ${esc(acc.accountRaw || "—")}<br>
+          <b>Perfil:</b> ${esc(acc.profile || "—")}<br>
+          <b>Correo detectado:</b><br>
+          <span style="color:#fff;font-weight:1000">${esc(data.email || acc.email || "—")}</span><br><br>
+          Si necesitas tu código de acceso, podemos ayudarte rápidamente desde soporte.
+        </div>
+      </div>
+      <div class="modalButtons">
+        <button class="btn btnPrimary" onclick="window.open('${whatsappLink(buildManualCodeSupportMessage(acc))}','_blank','noopener')">🟢 Contactar a soporte</button>
+      </div>
+    `;
+
+    // No gastar flujo visual de reintento
+    $("#btnSearchCode").disabled = true;
+    $("#btnRetryCode").disabled = true;
+    $("#attemptsBox").textContent = "Soporte manual requerido";
+    return;
+  }
+
+  
   // Error genérico
   if (!data.ok && data.kind !== "no_email"){
     $("#codeResult").innerHTML = `
