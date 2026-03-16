@@ -1311,6 +1311,10 @@ function buildSupportMessage(acc, issueText){
 function buildManualCodeSupportMessage(acc){
   return `*Hola TopStreaming 👋*\n\nEstoy solicitando un código desde el portal de clientes, pero el sistema indica que este correo no está habilitado para búsqueda automática.\n\n📺 Cuenta: *${acc.accountRaw || "—"}*\n👤 Perfil: ${acc.profile || "—"}\n📧 Correo detectado: ${acc.email || "—"}\n🧩 Plataforma: ${acc.platformDisplay || acc.platformKey || "—"}\n\n¿Podrían ayudarme a obtener el código de acceso?\n\nGracias.`;
 }
+
+function buildNetflixHomeUpdateMessage(acc){
+  return `*Hola TopStreaming 👋*\n\nEstoy usando el portal de clientes y en Netflix me aparece la opción *Actualizar hogar*.\n\nEntiendo que este caso ya no se resuelve con código automático y que requiere cambio de cuenta.\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n✅ Perfil: ${acc.profile || "—"}\n✅ Motivo: Actualizar hogar\n\nSolicito apoyo para el cambio de cuenta.\n\nGracias.`;
+}
   
 function renderCards(){
   const grid = $("#cardsGrid");
@@ -1533,7 +1537,7 @@ function openCodeModal(rowNumber){
   state.activeCodeOption = "";
   state.activeCodeMotivo = "";
 
-  // Cada vez que abras el modal, arranca limpio
+  // siempre abrir limpio
   state.codeStarted[rowNumber] = false;
 
   const started = false;
@@ -1657,6 +1661,32 @@ async function runCodeSearch(isRetry){
   if(isNetflix && !state.activeCodeOption) return;
   if(!isNetflix && !state.activeCodeMotivo) return;
 
+  // ✅ NETFLIX: si eligió "Actualizar hogar", NO buscar código
+  if (isNetflix && state.activeCodeOption === "hogar") {
+    $("#codeLoader").classList.remove("show");
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffe58a">⚠ Actualizar hogar de Netflix</div>
+        <div style="color:rgba(226,232,240,.84);font-size:14px;line-height:1.6">
+          Netflix implementó esta verificación para evitar que las cuentas se usen fuera del hogar.<br><br>
+          Si actualizamos el hogar, es muy probable que el mensaje vuelva a aparecer <b>todos los días</b>.<br><br>
+          A diferencia de <b>“Estoy de viaje”</b>, este caso <b>no se soluciona con un código temporal</b>.<br><br>
+          Para que puedas seguir viendo tus series <b>sin interrupciones</b>, la solución es <b>cambiarte a una cuenta nueva</b>.
+        </div>
+      </div>
+
+      <div class="modalButtons">
+        <button class="btn btnPrimary" onclick="window.open('${whatsappLink(buildNetflixHomeUpdateMessage(acc))}','_blank','noopener')">Solicitar nueva cuenta</button>
+        <button class="btn btnGhost" onclick="closeModal()">Cerrar</button>
+      </div>
+    `;
+
+    $("#btnSearchCode").disabled = true;
+    $("#btnRetryCode").disabled = true;
+    $("#attemptsBox").textContent = "Cambio de cuenta requerido";
+    return;
+  }
+
   if(!isRetry){
     state.codeStarted[rowNumber] = true;
     $("#btnSearchCode").disabled = true;
@@ -1666,16 +1696,15 @@ async function runCodeSearch(isRetry){
   $("#codeResult").innerHTML = "";
 
   const data = await apiPost("code", {
-  sessionToken: state.sessionToken,
-  phone: $("#loginPhone")?.value?.trim() || "",
-  email: acc.email || "",
-  platformKey: acc.platformKey || "",
-  accountRaw: acc.accountRaw || "",
-  profile: acc.profile || "",
-  option: state.activeCodeOption,
-  motivo: state.activeCodeMotivo
-});
-
+    sessionToken: state.sessionToken,
+    phone: $("#loginPhone")?.value?.trim() || "",
+    email: acc.email || "",
+    platformKey: acc.platformKey || "",
+    accountRaw: acc.accountRaw || "",
+    profile: acc.profile || "",
+    option: state.activeCodeOption,
+    motivo: state.activeCodeMotivo
+  });
 
   $("#codeLoader").classList.remove("show");
 
@@ -1700,7 +1729,7 @@ async function runCodeSearch(isRetry){
     return;
   }
 
-    // Soporte manual por dominio no permitido
+  // Soporte manual por dominio no permitido
   if (!data.ok && data.kind === "manual_support"){
     $("#codeResult").innerHTML = `
       <div class="resultBox">
@@ -1720,14 +1749,12 @@ async function runCodeSearch(isRetry){
       </div>
     `;
 
-    // No gastar flujo visual de reintento
     $("#btnSearchCode").disabled = true;
     $("#btnRetryCode").disabled = true;
     $("#attemptsBox").textContent = "Soporte manual requerido";
     return;
   }
 
-  
   // Error genérico
   if (!data.ok && data.kind !== "no_email"){
     $("#codeResult").innerHTML = `
