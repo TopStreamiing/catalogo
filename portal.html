@@ -897,6 +897,8 @@ const RESTRICTED_KEYS = [
   "SPOTIFY","YTPREMIUM","PLEX","ANTIVIRUS"
 ];
 
+const persistedCodeState = loadCodeState();
+
 const state = {
   sessionToken: localStorage.getItem("ts_session_token") || "",
   welcomeName: "",
@@ -906,8 +908,9 @@ const state = {
   activeCodeType: "",
   activeCodeOption: "",
   activeCodeMotivo: "",
-  codeAttempts: {},      // rowNumber -> remaining
-  codeStarted: {},       // rowNumber -> bool
+  codeAttempts: persistedCodeState.codeAttempts || {},   // rowNumber -> remaining
+  blockedCodes: persistedCodeState.blockedCodes || {},   // rowNumber -> true/false
+  codeStarted: {},                                       // rowNumber -> bool
   retryTimers: {},
   cacheLoaded:false,
   cacheExpire:0
@@ -976,20 +979,23 @@ function savePanelCache(data){
   localStorage.setItem("ts_panel_cache",JSON.stringify(cache));
 }
 
-function loadPanelCache(){
-  const raw = localStorage.getItem("ts_panel_cache");
-  if(!raw) return null;
+function loadCodeState(){
+  const raw = localStorage.getItem("ts_code_state");
+  if(!raw) return {};
 
   try{
-    const cache = JSON.parse(raw);
-    if(Date.now() > cache.expire){
-      localStorage.removeItem("ts_panel_cache");
-      return null;
-    }
-    return cache.data;
+    const data = JSON.parse(raw);
+    return data && typeof data === "object" ? data : {};
   }catch(e){
-    return null;
+    return {};
   }
+}
+
+function saveCodeState(){
+  localStorage.setItem("ts_code_state", JSON.stringify({
+    codeAttempts: state.codeAttempts,
+    blockedCodes: state.blockedCodes || {}
+  }));
 }
   
 function showToast(msg){
@@ -1235,7 +1241,10 @@ if(cache && state.sessionToken){
 function clearSession(){
   localStorage.removeItem("ts_session_token");
   localStorage.removeItem("ts_panel_cache");
+  localStorage.removeItem("ts_code_state");
   state.sessionToken = "";
+  state.codeAttempts = {};
+  state.blockedCodes = {};
 }
 
 async function refreshAccountsBackground(){
@@ -1537,9 +1546,9 @@ function openCodeModal(rowNumber){
   state.activeCodeOption = "";
   state.activeCodeMotivo = "";
 
-  // siempre abrir limpio
   state.codeStarted[rowNumber] = false;
 
+  const isBlocked = !!state.blockedCodes[rowNumber];
   const started = false;
   const remaining = (typeof state.codeAttempts[rowNumber] === "number") ? state.codeAttempts[rowNumber] : 3;
   const isNetflix = state.activeCodeType === "NETFLIX" || state.activeCodeType === "NETFLIXPRO";
@@ -1593,35 +1602,49 @@ function openCodeModal(rowNumber){
       <button id="btnRetryCode" class="btn btnGhost" disabled>Reintentar</button>
     </div>
 
-    <div id="attemptsBox" class="attempts">Te quedan ${remaining} de 3</div>
+    <div id="attemptsBox" class="attempts">${isBlocked || remaining <= 0 ? "Intentos agotados" : `Te quedan ${remaining} de 3`}</div>
     <div id="codeLoader" class="loader">🔎 Buscando código...</div>
     <div id="codeResult"></div>
   `);
 
   bindModalClose();
 
-  document.querySelectorAll("[data-kind]").forEach(btn => {
+    document.querySelectorAll("[data-kind]").forEach(btn => {
     btn.addEventListener("click", () => {
+      if (isBlocked || remaining <= 0) return;
+
       document.querySelectorAll("[data-kind]").forEach(x => x.classList.remove("active"));
       btn.classList.add("active");
 
       if (btn.dataset.kind === "option") state.activeCodeOption = btn.dataset.value;
       if (btn.dataset.kind === "motivo") state.activeCodeMotivo = btn.dataset.value;
 
-      if (!started) {
-        $("#btnSearchCode").disabled = !(state.activeCodeOption || state.activeCodeMotivo);
-      }
+      $("#btnSearchCode").disabled = !(state.activeCodeOption || state.activeCodeMotivo);
     });
   });
 
   $("#btnSearchCode").onclick = () => runCodeSearch(false);
   $("#btnRetryCode").onclick = () => runCodeSearch(true);
 
+  if (isBlocked || remaining <= 0) {
+    $("#btnSearchCode").disabled = true;
+    $("#btnRetryCode").disabled = true;
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
+        <div>Ya agotaste tus 3 intentos. Solicita tu código por WhatsApp.</div>
+      </div>
+      <div class="modalButtons">
+        <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
+      </div>
+    `;
+    return;
+  }
+
   if(started){
     $("#btnSearchCode").disabled = true;
     handleRetryButton(rowNumber);
   }
-}
 
 function handleRetryButton(rowNumber){
   const btn = $("#btnRetryCode");
@@ -1655,6 +1678,23 @@ async function runCodeSearch(isRetry){
   const rowNumber = state.activeCodeRow;
   const acc = state.accounts.find(x => Number(x.rowNumber) === Number(rowNumber));
   if(!acc) return;
+
+  if (state.blockedCodes[rowNumber] || state.codeAttempts[rowNumber] === 0) {
+    $("#codeLoader").classList.remove("show");
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
+        <div>Ya agotaste tus 3 intentos. Solicita tu código por WhatsApp.</div>
+      </div>
+      <div class="modalButtons">
+        <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
+      </div>
+    `;
+    $("#btnSearchCode").disabled = true;
+    $("#btnRetryCode").disabled = true;
+    $("#attemptsBox").textContent = "Intentos agotados";
+    return;
+  }
 
   const isNetflix = state.activeCodeType === "NETFLIX" || state.activeCodeType === "NETFLIXPRO";
 
@@ -1708,24 +1748,39 @@ async function runCodeSearch(isRetry){
 
   $("#codeLoader").classList.remove("show");
 
-  if (typeof data.remaining === "number"){
+    if (typeof data.remaining === "number"){
     state.codeAttempts[rowNumber] = data.remaining;
-    $("#attemptsBox").textContent = data.remaining > 0 ? `Te quedan ${data.remaining} de 3` : "Intentos agotados";
+
+    if (data.remaining <= 0) {
+      state.blockedCodes[rowNumber] = true;
+      $("#attemptsBox").textContent = "Intentos agotados";
+      $("#btnSearchCode").disabled = true;
+      $("#btnRetryCode").disabled = true;
+    } else {
+      $("#attemptsBox").textContent = `Te quedan ${data.remaining} de 3`;
+    }
+
+    saveCodeState();
   }
 
   // Bloqueo
-  if (!data.ok && data.kind === "blocked"){
+    if (!data.ok && data.kind === "blocked"){
+    state.codeAttempts[rowNumber] = 0;
+    state.blockedCodes[rowNumber] = true;
+    saveCodeState();
+
     $("#codeResult").innerHTML = `
       <div class="resultBox">
-        <div class="resultTitle" style="color:#ffb0b0">❌ Acceso temporalmente bloqueado</div>
-        <div>${esc(data.message || "Intenta más tarde o contacta soporte.")}</div>
+        <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
+        <div>${esc(data.message || "Ya agotaste tus 3 intentos. Solicita tu código por WhatsApp.")}</div>
       </div>
       <div class="modalButtons">
-        <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para encontrar mi código.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">WhatsApp</button>
+        <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
       </div>
     `;
     $("#btnSearchCode").disabled = true;
     $("#btnRetryCode").disabled = true;
+    $("#attemptsBox").textContent = "Intentos agotados";
     return;
   }
 
