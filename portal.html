@@ -979,6 +979,22 @@ function savePanelCache(data){
   localStorage.setItem("ts_panel_cache",JSON.stringify(cache));
 }
 
+function loadPanelCache(){
+  const raw = localStorage.getItem("ts_panel_cache");
+  if(!raw) return null;
+
+  try{
+    const cache = JSON.parse(raw);
+    if(Date.now() > cache.expire){
+      localStorage.removeItem("ts_panel_cache");
+      return null;
+    }
+    return cache.data;
+  }catch(e){
+    return null;
+  }
+}
+  
 function loadCodeState(){
   const raw = localStorage.getItem("ts_code_state");
   if(!raw) return {};
@@ -1641,12 +1657,13 @@ function openCodeModal(rowNumber){
     return;
   }
 
-  if(started){
+    if(started){
     $("#btnSearchCode").disabled = true;
     handleRetryButton(rowNumber);
   }
+}
 
-function handleRetryButton(rowNumber){
+  function handleRetryButton(rowNumber){
   const btn = $("#btnRetryCode");
   if(!btn) return;
 
