@@ -781,7 +781,7 @@
   </div>
 
  <div class="tools">
-  <a class="btn btn-transmision" href="https://www.mslatan.xyz" target="_blank" rel="noopener" title="Transmisión">
+  <a class="btn btn-transmision" href="https://www.mslatan.xyz" title="Transmisión">
     <img src="assets/Transmision.png" alt="Transmisión">
   </a>
 
@@ -989,7 +989,7 @@ function buildCardHTML(x, realIndex){
   const nStock = toNumberStock(x.stock);
 
   const buyBtn = (nStock !== null && nStock > 0)
-  ? `<a class="btn btn-buy" href="https://wa.link/firnrr" target="_blank" rel="noopener">🛒 Comprar</a>`
+  ? `<button class="btn btn-buy" onclick="comprar('${escapeHtml(x.nombre)}')">🛒 Comprar</button>`
   : `<span></span>`;
 
   const tag = String(
@@ -2526,6 +2526,15 @@ async function loadStock(){
 
 
     // Eventos
+
+    function comprar(nombre){
+  const texto = `Hola TopStreaming 👋\nVi que tienen en STOCK de ${nombre.toUpperCase()} y deseo adquirirla.`;
+  const numero = "51904293916";
+  const url = `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
+
+  window.open(url, "_blank");
+}
+    
     $("btnPortal").addEventListener("click", () => {
   window.location.href = "portal.html";
 });
