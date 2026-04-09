@@ -791,22 +791,13 @@
     <span class="wa-dot"></span> WhatsApp
   </a>
 
-  <a class="btn btn-movie" id="btnPeliculas">
-  🍿 Buscar película
-</a>
+  <a class="btn btn-movie" href="https://www.justwatch.com/pe" target="_blank" rel="noopener">
+    🍿 Buscar película
+  </a>
 
   <button class="btn" id="btnReload">🔄 Actualizar</button>
 </div>
 </header>
-
-    <div id="peliculasContainer" style="display:none; margin-top:16px;">
-  <iframe 
-    src="https://www.justwatch.com/pe" 
-    style="width:100%; height:80vh; border:none; border-radius:16px;">
-  </iframe>
-</div>
-
-    
 
 <div class="hero">
   <div class="hero-title">👀👉 Busca tu producto en <span class="brandAccent">TopStreaming</span></div>
@@ -2594,8 +2585,8 @@ $("bannerPrev")?.addEventListener("click", prevBanner);
     });
 
     $("bnPeliculas")?.addEventListener("click", () => {
-  document.getElementById("peliculasContainer").style.display = "block";
-});
+      window.open("https://www.justwatch.com/pe", "_blank", "noopener");
+    });
 
     $("bnContacto")?.addEventListener("click", () => {
       window.open("https://wa.link/fzemlu", "_blank", "noopener");
