@@ -2528,7 +2528,7 @@ async function loadStock(){
     // Eventos
 
     function comprar(nombre){
-  const texto = `Hola TopStreaming 👋\nVi que tienen en STOCK de ${nombre.toUpperCase()} y deseo adquirirla.`;
+  const texto = `*Hola TopStreaming* 👋\nVi que tienen en *STOCK* de *${nombre.toUpperCase()}* y deseo adquirirla.`;
   const numero = "51904293916";
   const url = `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
 
