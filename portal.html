@@ -1237,16 +1237,16 @@ if(cache && state.sessionToken){
     return;
   }
 
-  state.accounts = Array.isArray(a.accounts) ? a.accounts : [];
+   state.accounts = Array.isArray(a.accounts) ? a.accounts : [];
   savePanelCache({
-  welcomeName:state.welcomeName,
-  initial:state.initial,
-  accounts:state.accounts.map(acc=>({
-    ...acc,
-    email:"",
-    password:""
-  }))
-});
+    welcomeName: state.welcomeName,
+    initial: state.initial,
+    accounts: state.accounts.map(acc => ({
+      ...acc,
+      email: String(acc.platformKey || "").toUpperCase() === "NETFLIXPRO" ? (acc.email || "") : "",
+      password: ""
+    }))
+  });
   $("#userInitial").textContent = state.initial;
   $("#userName").textContent = `Bienvenid@, ${state.welcomeName}`;
 
@@ -1271,12 +1271,12 @@ async function refreshAccountsBackground(){
     state.accounts = Array.isArray(a.accounts) ? a.accounts : [];
 
     // actualiza también el cache visible, sin guardar correo/contraseña
-    savePanelCache({
+        savePanelCache({
       welcomeName: state.welcomeName,
       initial: state.initial,
       accounts: state.accounts.map(acc => ({
         ...acc,
-        email: "",
+        email: String(acc.platformKey || "").toUpperCase() === "NETFLIXPRO" ? (acc.email || "") : "",
         password: ""
       }))
     });
@@ -1508,7 +1508,7 @@ function openAccess(rowNumber){
 
   const restricted = RESTRICTED_KEYS.includes(String(acc.platformKey || "").toUpperCase());
 
-  if(restricted){
+    if(restricted){
     openModal(`
       <button id="modalX" class="modalClose">✕</button>
       <div class="modalTitle">Ver acceso</div>
@@ -1517,12 +1517,16 @@ function openAccess(rowNumber){
       <div class="resultBox">
         <div class="resultTitle">Cuenta administrada por TopStreaming</div>
         <div style="color:rgba(226,232,240,.84);font-size:14px;line-height:1.55">
-          Por seguridad, esta cuenta es gestionada directamente por nuestro sistema y no muestra datos de acceso en el portal.<br><br>
-          Si necesitas ayuda con tu cuenta, contáctanos por WhatsApp.
+          Por seguridad, esta cuenta es gestionada directamente por nuestro sistema y no muestra la contraseña en el portal.<br><br>
+          Puedes usar el siguiente correo para identificar tu cuenta:
         </div>
+
+        <div class="resultMeta" style="margin-top:14px">Correo</div>
+        <div style="font-size:18px;font-weight:1000">${esc(acc.email || "No disponible")}</div>
       </div>
 
       <div class="modalButtons">
+        ${acc.email ? `<button class="btn btnGhost" onclick="copyText('${esc(acc.email)}')">Copiar correo</button>` : ``}
         <button class="btn btnPrimary" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda con mi cuenta.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Contactar soporte</button>
       </div>
     `);
