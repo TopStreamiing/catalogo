@@ -1851,22 +1851,44 @@ async function runCodeSearch(isRetry){
     return;
   }
 
-  // Expirado / válido
+    // Expirado / válido
   if (isNetflix){
+    const netflixResponseType = String(data.responseType || "link").toLowerCase();
+    const isNetflixCode = netflixResponseType === "code";
+
     $("#codeResult").innerHTML = `
       <div class="resultBox">
-        <div class="resultTitle">${esc(data.subject || "Tu código de acceso temporal de Netflix")}</div>
+        <div class="resultTitle">${esc(data.subject || (isNetflixCode ? "Netflix: Tu código de inicio de sesión" : "Tu código de acceso temporal de Netflix"))}</div>
         <div class="resultMeta">Correo: <b>${esc(maskEmail(data.email || acc.email || ""))}</b></div>
         <div class="resultMeta">Hora: <b>${esc(data.timeText || "—")} (PET)</b></div>
+
         ${data.kind === "expired" ? `
-          <div class="resultMeta" style="color:#ffe58a;margin-top:8px"><b>⚠ El enlace encontrado ya expiró.</b></div>
+          <div class="resultMeta" style="color:#ffe58a;margin-top:8px">
+            <b>⚠ ${isNetflixCode ? "El código encontrado ya expiró." : "El enlace encontrado ya expiró."}</b>
+          </div>
         ` : `
-          <div class="resultLink">${esc(data.link || "")}</div>
+          ${isNetflixCode
+            ? `<div class="resultCode">${esc(data.code || "")}</div>`
+            : `<div class="resultLink">${esc(data.link || "")}</div>`
+          }
         `}
       </div>
+
       <div class="modalButtons">
-        ${data.kind === "valid" && data.link ? `<button class="btn btnPrimary" onclick="window.open('${esc(data.link)}','_blank','noopener')">Abrir enlace</button>` : ``}
-        ${data.kind === "valid" && data.link ? `<button class="btn btnGhost" onclick="copyText('${esc(data.link)}')">Copiar enlace</button>` : ``}
+        ${data.kind === "valid" && isNetflixCode && data.code
+          ? `<button class="btn btnPrimary" onclick="copyText('${esc(data.code)}')">Copiar código</button>`
+          : ``
+        }
+
+        ${data.kind === "valid" && !isNetflixCode && data.link
+          ? `<button class="btn btnPrimary" onclick="window.open('${esc(data.link)}','_blank','noopener')">Abrir enlace</button>`
+          : ``
+        }
+
+        ${data.kind === "valid" && !isNetflixCode && data.link
+          ? `<button class="btn btnGhost" onclick="copyText('${esc(data.link)}')">Copiar enlace</button>`
+          : ``
+        }
       </div>
     `;
   } else {
@@ -1889,6 +1911,9 @@ async function runCodeSearch(isRetry){
 
   startRetryCooldown(rowNumber);
 }
+
+
+  
 
 function startRetryCooldown(rowNumber){
   state.retryTimers[rowNumber] = Date.now() + 30000;
