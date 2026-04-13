@@ -1577,15 +1577,12 @@ function renderNetflixStartView(acc, remaining, isBlocked){
       <button id="btnNetflixPlaybackFlow" class="optionBtn">No me deja reproducir nada</button>
     </div>
 
-    <div class="modalButtons">
-      <button id="btnRetryCode" class="btn btnGhost" disabled>Reintentar</button>
-    </div>
 
     <div id="attemptsBox" class="attempts">${isBlocked || remaining <= 0 ? "Intentos agotados" : `Te quedan ${remaining} de 3`}</div>
     <div id="codeLoader" class="loader">🔎 Buscando código...</div>
     <div id="codeResult"></div>
   `;
-
+  $("#modalBack").classList.add("show");
   bindModalClose();
 
   $("#btnNetflixLoginFlow").onclick = () => {
@@ -1603,7 +1600,7 @@ function renderNetflixStartView(acc, remaining, isBlocked){
   $("#btnRetryCode").onclick = () => runCodeSearch(true);
 
   if (isBlocked || remaining <= 0) {
-    $("#btnRetryCode").disabled = true;
+    $("#btnRetryCode")?.disabled = true;
     $("#codeResult").innerHTML = `
       <div class="resultBox">
         <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
@@ -1643,7 +1640,7 @@ function renderNetflixLoginView(acc, remaining, isBlocked){
     <div id="codeLoader" class="loader">🔎 Buscando código...</div>
     <div id="codeResult"></div>
   `;
-
+  $("#modalBack").classList.add("show");
   bindModalClose();
 
   $("#btnNetflixBackStart").onclick = () => {
@@ -1653,15 +1650,15 @@ function renderNetflixLoginView(acc, remaining, isBlocked){
   };
 
   $("#btnNetflixLoginCode").onclick = () => {
-    state.activeCodeOption = "login";
-    state.netflixGuideOption = "login";
-    runCodeSearch(false);
-  };
+  state.activeCodeOption = "";
+  state.netflixGuideOption = "login";
+  runCodeSearch(false);
+};
 
   $("#btnRetryCode").onclick = () => runCodeSearch(true);
 
   if (isBlocked || remaining <= 0) {
-    $("#btnRetryCode").disabled = true;
+    $("#btnRetryCode")?.disabled = true;
     $("#codeResult").innerHTML = `
       <div class="resultBox">
         <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
@@ -1761,7 +1758,7 @@ function renderNetflixPlaybackView(acc, remaining, isBlocked){
     <div id="codeLoader" class="loader">🔎 Buscando código...</div>
     <div id="codeResult"></div>
   `;
-
+  $("#modalBack").classList.add("show");
   bindModalClose();
 
   $("#btnNetflixBackStart").onclick = () => {
@@ -1797,7 +1794,7 @@ function renderNetflixPlaybackView(acc, remaining, isBlocked){
   }
 
   if (isBlocked || remaining <= 0) {
-    $("#btnRetryCode").disabled = true;
+    $("#btnRetryCode")?.disabled = true;
     $("#codeResult").innerHTML = `
       <div class="resultBox">
         <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
@@ -1886,8 +1883,8 @@ function openCodeModal(rowNumber){
   $("#btnRetryCode").onclick = () => runCodeSearch(true);
 
   if (isBlocked || remaining <= 0) {
-    $("#btnSearchCode").disabled = true;
-    $("#btnRetryCode").disabled = true;
+    $("#btnSearchCode")?.disabled = true;
+    $("#btnRetryCode")?.disabled = true;
     $("#codeResult").innerHTML = `
       <div class="resultBox">
         <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
@@ -1901,11 +1898,6 @@ function openCodeModal(rowNumber){
   }
 }
 
-    if(started){
-    $("#btnSearchCode").disabled = true;
-    handleRetryButton(rowNumber);
-  }
-}
 
   function handleRetryButton(rowNumber){
   const btn = $("#btnRetryCode");
@@ -1951,17 +1943,14 @@ async function runCodeSearch(isRetry){
         <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
       </div>
     `;
-    $("#btnSearchCode").disabled = true;
-    $("#btnRetryCode").disabled = true;
+    $("#btnSearchCode")?.disabled = true;
+    $("#btnRetryCode")?.disabled = true;
     $("#attemptsBox").textContent = "Intentos agotados";
     return;
   }
 
   const isNetflix = state.activeCodeType === "NETFLIX" || state.activeCodeType === "NETFLIXPRO";
   
-  if (isNetflix && state.netflixGuideOption === "login" && !state.activeCodeOption) {
-  state.activeCodeOption = "login";
-}
   if (isNetflix && !state.activeCodeOption && state.netflixGuideOption !== "login") return;
   if (!isNetflix && !state.activeCodeMotivo) return;
 
@@ -1985,15 +1974,15 @@ async function runCodeSearch(isRetry){
       </div>
     `;
 
-    $("#btnSearchCode").disabled = true;
-    $("#btnRetryCode").disabled = true;
+    $("#btnSearchCode")?.disabled = true;
+    $("#btnRetryCode")?.disabled = true;
     $("#attemptsBox").textContent = "Cambio de cuenta requerido";
     return;
   }
 
   if(!isRetry){
     state.codeStarted[rowNumber] = true;
-    $("#btnSearchCode").disabled = true;
+    $("#btnSearchCode")?.disabled = true;
   }
 
   $("#codeLoader").classList.add("show");
@@ -2018,8 +2007,8 @@ async function runCodeSearch(isRetry){
     if (data.remaining <= 0) {
       state.blockedCodes[rowNumber] = true;
       $("#attemptsBox").textContent = "Intentos agotados";
-      $("#btnSearchCode").disabled = true;
-      $("#btnRetryCode").disabled = true;
+      $("#btnSearchCode")?.disabled = true;
+      $("#btnRetryCode")?.disabled = true;
     } else {
       $("#attemptsBox").textContent = `Te quedan ${data.remaining} de 3`;
     }
@@ -2042,8 +2031,8 @@ async function runCodeSearch(isRetry){
         <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
       </div>
     `;
-    $("#btnSearchCode").disabled = true;
-    $("#btnRetryCode").disabled = true;
+    $("#btnSearchCode")?.disabled = true;
+    $("#btnRetryCode")?.disabled = true;
     $("#attemptsBox").textContent = "Intentos agotados";
     return;
   }
@@ -2068,8 +2057,8 @@ async function runCodeSearch(isRetry){
       </div>
     `;
 
-    $("#btnSearchCode").disabled = true;
-    $("#btnRetryCode").disabled = true;
+    $("#btnSearchCode")?.disabled = true;
+    $("#btnRetryCode")?.disabled = true;
     $("#attemptsBox").textContent = "Soporte manual requerido";
     return;
   }
@@ -2164,7 +2153,7 @@ async function runCodeSearch(isRetry){
 
 function startRetryCooldown(rowNumber){
   state.retryTimers[rowNumber] = Date.now() + 30000;
-  $("#btnSearchCode").disabled = true;
+  $("#btnSearchCode")?.disabled = true;
   handleRetryButton(rowNumber);
 }
 
