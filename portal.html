@@ -1599,7 +1599,7 @@ function renderNetflixStartView(acc, remaining, isBlocked){
 
 
   if (isBlocked || remaining <= 0) {
-    $("#btnRetryCode")?.disabled = true;
+    if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     $("#codeResult").innerHTML = `
       <div class="resultBox">
         <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
@@ -1657,7 +1657,7 @@ function renderNetflixLoginView(acc, remaining, isBlocked){
   $("#btnRetryCode").onclick = () => runCodeSearch(true);
 
   if (isBlocked || remaining <= 0) {
-    $("#btnRetryCode")?.disabled = true;
+    if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     $("#codeResult").innerHTML = `
       <div class="resultBox">
         <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
@@ -1793,7 +1793,7 @@ function renderNetflixPlaybackView(acc, remaining, isBlocked){
   }
 
   if (isBlocked || remaining <= 0) {
-    $("#btnRetryCode")?.disabled = true;
+    if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     $("#codeResult").innerHTML = `
       <div class="resultBox">
         <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
@@ -1882,8 +1882,8 @@ function openCodeModal(rowNumber){
   $("#btnRetryCode").onclick = () => runCodeSearch(true);
 
   if (isBlocked || remaining <= 0) {
-    $("#btnSearchCode")?.disabled = true;
-    $("#btnRetryCode")?.disabled = true;
+    if ($("#btnSearchCode")) $("#btnSearchCode").disabled = true;
+    if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     $("#codeResult").innerHTML = `
       <div class="resultBox">
         <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
@@ -1942,8 +1942,8 @@ async function runCodeSearch(isRetry){
         <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
       </div>
     `;
-    $("#btnSearchCode")?.disabled = true;
-    $("#btnRetryCode")?.disabled = true;
+    if ($("#btnSearchCode")) $("#btnSearchCode").disabled = true;
+    if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     $("#attemptsBox").textContent = "Intentos agotados";
     return;
   }
@@ -1973,15 +1973,15 @@ async function runCodeSearch(isRetry){
       </div>
     `;
 
-    $("#btnSearchCode")?.disabled = true;
-    $("#btnRetryCode")?.disabled = true;
+    if ($("#btnSearchCode")) $("#btnSearchCode").disabled = true;
+    if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     $("#attemptsBox").textContent = "Cambio de cuenta requerido";
     return;
   }
 
   if(!isRetry){
     state.codeStarted[rowNumber] = true;
-    $("#btnSearchCode")?.disabled = true;
+    if ($("#btnSearchCode")) $("#btnSearchCode").disabled = true;
   }
 
   $("#codeLoader").classList.add("show");
@@ -2006,8 +2006,8 @@ async function runCodeSearch(isRetry){
     if (data.remaining <= 0) {
       state.blockedCodes[rowNumber] = true;
       $("#attemptsBox").textContent = "Intentos agotados";
-      $("#btnSearchCode")?.disabled = true;
-      $("#btnRetryCode")?.disabled = true;
+      if ($("#btnSearchCode")) $("#btnSearchCode").disabled = true;
+      if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     } else {
       $("#attemptsBox").textContent = `Te quedan ${data.remaining} de 3`;
     }
@@ -2030,8 +2030,8 @@ async function runCodeSearch(isRetry){
         <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
       </div>
     `;
-    $("#btnSearchCode")?.disabled = true;
-    $("#btnRetryCode")?.disabled = true;
+    if ($("#btnSearchCode")) $("#btnSearchCode").disabled = true;
+    if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     $("#attemptsBox").textContent = "Intentos agotados";
     return;
   }
@@ -2056,8 +2056,8 @@ async function runCodeSearch(isRetry){
       </div>
     `;
 
-    $("#btnSearchCode")?.disabled = true;
-    $("#btnRetryCode")?.disabled = true;
+    if ($("#btnSearchCode")) $("#btnSearchCode").disabled = true;
+    if ($("#btnRetryCode")) $("#btnRetryCode").disabled = true;
     $("#attemptsBox").textContent = "Soporte manual requerido";
     return;
   }
@@ -2152,7 +2152,7 @@ async function runCodeSearch(isRetry){
 
 function startRetryCooldown(rowNumber){
   state.retryTimers[rowNumber] = Date.now() + 30000;
-  $("#btnSearchCode")?.disabled = true;
+  if ($("#btnSearchCode")) $("#btnSearchCode").disabled = true;
   handleRetryButton(rowNumber);
 }
 
