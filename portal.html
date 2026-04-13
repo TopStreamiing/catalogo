@@ -1597,7 +1597,6 @@ function renderNetflixStartView(acc, remaining, isBlocked){
     renderNetflixPlaybackView(acc, remaining, isBlocked);
   };
 
-  $("#btnRetryCode").onclick = () => runCodeSearch(true);
 
   if (isBlocked || remaining <= 0) {
     $("#btnRetryCode")?.disabled = true;
