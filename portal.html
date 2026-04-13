@@ -908,6 +908,8 @@ const state = {
   activeCodeType: "",
   activeCodeOption: "",
   activeCodeMotivo: "",
+  netflixFlowStep: "",          // "start" | "login" | "playback"
+  netflixGuideOption: "",       // "viaje" | "temporal" | "hogar" | "login"
   codeAttempts: persistedCodeState.codeAttempts || {},   // rowNumber -> remaining
   blockedCodes: persistedCodeState.blockedCodes || {},   // rowNumber -> true/false
   codeStarted: {},                                       // rowNumber -> bool
@@ -1091,6 +1093,8 @@ function closeModal(){
   state.activeCodeType = "";
   state.activeCodeOption = "";
   state.activeCodeMotivo = "";
+  state.netflixFlowStep = "";
+  state.netflixGuideOption = "";
 }
 
 function whatsappLink(message){
@@ -1554,6 +1558,260 @@ function openAccess(rowNumber){
   bindModalClose();
 }
 
+
+function renderNetflixStartView(acc, remaining, isBlocked){
+  $("#modalContent").innerHTML = `
+    <button id="modalX" class="modalClose">✕</button>
+    <div class="modalTitle">Solicitar código Netflix</div>
+    <div class="modalSub">${esc(acc.platformDisplay)} · ${esc(acc.profile || "—")}</div>
+
+    <div class="infoBox">
+      <b>⚠ Importante</b><br>
+      Sigue los pasos según tu caso y solo solicita el código cuando Netflix ya te lo esté pidiendo en tu dispositivo.
+    </div>
+
+    <div class="modalSub">¿Qué deseas hacer en Netflix?</div>
+
+    <div class="optionGrid">
+      <button id="btnNetflixLoginFlow" class="optionBtn">Iniciar sesión</button>
+      <button id="btnNetflixPlaybackFlow" class="optionBtn">No me deja reproducir nada</button>
+    </div>
+
+    <div class="modalButtons">
+      <button id="btnRetryCode" class="btn btnGhost" disabled>Reintentar</button>
+    </div>
+
+    <div id="attemptsBox" class="attempts">${isBlocked || remaining <= 0 ? "Intentos agotados" : `Te quedan ${remaining} de 3`}</div>
+    <div id="codeLoader" class="loader">🔎 Buscando código...</div>
+    <div id="codeResult"></div>
+  `;
+
+  bindModalClose();
+
+  $("#btnNetflixLoginFlow").onclick = () => {
+    state.netflixFlowStep = "login";
+    state.netflixGuideOption = "login";
+    renderNetflixLoginView(acc, remaining, isBlocked);
+  };
+
+  $("#btnNetflixPlaybackFlow").onclick = () => {
+    state.netflixFlowStep = "playback";
+    state.netflixGuideOption = "";
+    renderNetflixPlaybackView(acc, remaining, isBlocked);
+  };
+
+  $("#btnRetryCode").onclick = () => runCodeSearch(true);
+
+  if (isBlocked || remaining <= 0) {
+    $("#btnRetryCode").disabled = true;
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
+        <div>Ya agotaste tus 3 intentos. Solicita tu código por WhatsApp.</div>
+      </div>
+      <div class="modalButtons">
+        <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
+      </div>
+    `;
+  } else if (state.codeStarted[acc.rowNumber]) {
+    handleRetryButton(acc.rowNumber);
+  }
+}
+
+function renderNetflixLoginView(acc, remaining, isBlocked){
+  $("#modalContent").innerHTML = `
+    <button id="modalX" class="modalClose">✕</button>
+    <div class="modalTitle">Iniciar sesión en Netflix</div>
+    <div class="modalSub">${esc(acc.platformDisplay)} · ${esc(acc.profile || "—")}</div>
+
+    <div class="resultBox">
+      <div style="font-size:14px;color:rgba(226,232,240,.84);line-height:1.6">
+        <b>Sigue estos pasos en tu celular o laptop:</b><br><br>
+        1. Ingresa el correo de tu cuenta en Netflix.<br>
+        2. Pulsa <b>Iniciar sesión</b>.<br>
+        3. Cuando Netflix te solicite el <b>código de 4 dígitos</b>, vuelve aquí.
+      </div>
+    </div>
+
+    <div class="modalButtons">
+      <button id="btnNetflixLoginCode" class="btn btnPrimary" ${isBlocked || remaining <= 0 ? "disabled" : ""}>Ya me pidió el código</button>
+      <button id="btnNetflixBackStart" class="btn btnGhost">Volver</button>
+      <button id="btnRetryCode" class="btn btnGhost" disabled>Reintentar</button>
+    </div>
+
+    <div id="attemptsBox" class="attempts">${isBlocked || remaining <= 0 ? "Intentos agotados" : `Te quedan ${remaining} de 3`}</div>
+    <div id="codeLoader" class="loader">🔎 Buscando código...</div>
+    <div id="codeResult"></div>
+  `;
+
+  bindModalClose();
+
+  $("#btnNetflixBackStart").onclick = () => {
+    state.netflixFlowStep = "start";
+    state.netflixGuideOption = "";
+    renderNetflixStartView(acc, remaining, isBlocked);
+  };
+
+  $("#btnNetflixLoginCode").onclick = () => {
+    state.activeCodeOption = "login";
+    state.netflixGuideOption = "login";
+    runCodeSearch(false);
+  };
+
+  $("#btnRetryCode").onclick = () => runCodeSearch(true);
+
+  if (isBlocked || remaining <= 0) {
+    $("#btnRetryCode").disabled = true;
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
+        <div>Ya agotaste tus 3 intentos. Solicita tu código por WhatsApp.</div>
+      </div>
+      <div class="modalButtons">
+        <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
+      </div>
+    `;
+  } else if (state.codeStarted[acc.rowNumber]) {
+    handleRetryButton(acc.rowNumber);
+  }
+}
+
+function getNetflixGuideBoxHtml(acc){
+  if (state.netflixGuideOption === "viaje") {
+    return `
+      <div class="resultBox">
+        <div class="resultTitle">Estoy de viaje</div>
+        <div style="font-size:14px;color:rgba(226,232,240,.84);line-height:1.6">
+          1. Pulsa <b>Estoy de viaje</b>.<br>
+          2. Luego pulsa <b>Enviar email</b>.
+        </div>
+      </div>
+      <div class="modalButtons">
+        <button id="btnNetflixAskCode" class="btn btnPrimary">Ya me pidió el código</button>
+      </div>
+    `;
+  }
+
+  if (state.netflixGuideOption === "temporal") {
+    return `
+      <div class="resultBox">
+        <div class="resultTitle">Ver temporalmente</div>
+        <div style="font-size:14px;color:rgba(226,232,240,.84);line-height:1.6">
+          1. Pulsa <b>Ver temporalmente</b>.<br>
+          2. Luego pulsa <b>Enviar email</b>.
+        </div>
+      </div>
+      <div class="modalButtons">
+        <button id="btnNetflixAskCode" class="btn btnPrimary">Ya me pidió el código</button>
+      </div>
+    `;
+  }
+
+  if (state.netflixGuideOption === "hogar") {
+    return `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffe58a">⚠ Actualizar hogar de Netflix</div>
+        <div style="color:rgba(226,232,240,.84);font-size:14px;line-height:1.6">
+          Netflix implementó esta verificación para evitar que las cuentas se usen fuera del hogar.<br><br>
+          Si actualizamos el hogar, es muy probable que el mensaje vuelva a aparecer <b>todos los días</b>.<br><br>
+          A diferencia de <b>“Estoy de viaje”</b>, este caso <b>no se soluciona con un código temporal</b>.<br><br>
+          Para que puedas seguir viendo tus series <b>sin interrupciones</b>, la solución es <b>cambiarte a una cuenta nueva</b>.
+        </div>
+      </div>
+      <div class="modalButtons">
+        <button class="btn btnPrimary" onclick="window.open('${whatsappLink(buildNetflixHomeUpdateMessage(acc))}','_blank','noopener')">Solicitar nueva cuenta</button>
+      </div>
+    `;
+  }
+
+  return ``;
+}
+
+function renderNetflixPlaybackView(acc, remaining, isBlocked){
+  $("#modalContent").innerHTML = `
+    <button id="modalX" class="modalClose">✕</button>
+    <div class="modalTitle">Netflix no te deja reproducir</div>
+    <div class="modalSub">${esc(acc.platformDisplay)} · ${esc(acc.profile || "—")}</div>
+
+    <div class="resultBox">
+      <div style="font-size:14px;color:rgba(226,232,240,.84);line-height:1.6">
+        En la pantalla del mensaje de Netflix, primero pulsa:<br><br>
+        <b>“Esta es mi cuenta”</b>
+      </div>
+    </div>
+
+    <div class="modalSub">¿Qué opción te aparece ahora?</div>
+
+    <div class="optionGrid">
+      <button class="optionBtn ${state.netflixGuideOption === "viaje" ? "active" : ""}" id="btnNetflixViaje">Estoy de viaje</button>
+      <button class="optionBtn ${state.netflixGuideOption === "temporal" ? "active" : ""}" id="btnNetflixTemporal">Ver temporalmente</button>
+      <button class="optionBtn ${state.netflixGuideOption === "hogar" ? "active" : ""}" id="btnNetflixHogar">Actualizar hogar</button>
+    </div>
+
+    <div id="netflixGuideBox">
+      ${getNetflixGuideBoxHtml(acc)}
+    </div>
+
+    <div class="modalButtons">
+      <button id="btnNetflixBackStart" class="btn btnGhost">Volver</button>
+      <button id="btnRetryCode" class="btn btnGhost" disabled>Reintentar</button>
+    </div>
+
+    <div id="attemptsBox" class="attempts">${isBlocked || remaining <= 0 ? "Intentos agotados" : `Te quedan ${remaining} de 3`}</div>
+    <div id="codeLoader" class="loader">🔎 Buscando código...</div>
+    <div id="codeResult"></div>
+  `;
+
+  bindModalClose();
+
+  $("#btnNetflixBackStart").onclick = () => {
+    state.netflixFlowStep = "start";
+    state.netflixGuideOption = "";
+    renderNetflixStartView(acc, remaining, isBlocked);
+  };
+
+  $("#btnNetflixViaje").onclick = () => {
+    state.netflixGuideOption = "viaje";
+    state.activeCodeOption = "viaje";
+    renderNetflixPlaybackView(acc, remaining, isBlocked);
+  };
+
+  $("#btnNetflixTemporal").onclick = () => {
+    state.netflixGuideOption = "temporal";
+    state.activeCodeOption = "temporal";
+    renderNetflixPlaybackView(acc, remaining, isBlocked);
+  };
+
+  $("#btnNetflixHogar").onclick = () => {
+    state.netflixGuideOption = "hogar";
+    state.activeCodeOption = "hogar";
+    renderNetflixPlaybackView(acc, remaining, isBlocked);
+  };
+
+  $("#btnRetryCode").onclick = () => runCodeSearch(true);
+
+  const askBtn = $("#btnNetflixAskCode");
+  if (askBtn) {
+    askBtn.onclick = () => runCodeSearch(false);
+    if (isBlocked || remaining <= 0) askBtn.disabled = true;
+  }
+
+  if (isBlocked || remaining <= 0) {
+    $("#btnRetryCode").disabled = true;
+    $("#codeResult").innerHTML = `
+      <div class="resultBox">
+        <div class="resultTitle" style="color:#ffb0b0">❌ Intentos agotados</div>
+        <div>Ya agotaste tus 3 intentos. Solicita tu código por WhatsApp.</div>
+      </div>
+      <div class="modalButtons">
+        <button class="btn btnDanger" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda para solicitar mi código manualmente.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Solicitar por WhatsApp</button>
+      </div>
+    `;
+  } else if (state.codeStarted[acc.rowNumber]) {
+    handleRetryButton(acc.rowNumber);
+  }
+}
+  
 /* =========================
    CODE MODAL
 ========================= */
@@ -1565,57 +1823,39 @@ function openCodeModal(rowNumber){
   state.activeCodeType = String(acc.platformKey || "").toUpperCase();
   state.activeCodeOption = "";
   state.activeCodeMotivo = "";
+  state.netflixFlowStep = "";
+  state.netflixGuideOption = "";
 
   state.codeStarted[rowNumber] = false;
 
   const isBlocked = !!state.blockedCodes[rowNumber];
-  const started = false;
   const remaining = (typeof state.codeAttempts[rowNumber] === "number") ? state.codeAttempts[rowNumber] : 3;
   const isNetflix = state.activeCodeType === "NETFLIX" || state.activeCodeType === "NETFLIXPRO";
-  const title = `Solicitar código ${isNetflix ? "Netflix" : "Disney+"}`;
 
-  const info = isNetflix
-    ? `
-      <div class="infoBox">
-        <b>⚠ Importante</b><br>
-        Presiona <b>Buscar código</b> solo después de haber dado a <b>Enviar email</b> en tu dispositivo.<br>
-        <b>No presiones Reenviar email.</b><br>
-        Si tienes inconvenientes para encontrar el código, escríbenos por <b>WhatsApp</b>.
-      </div>
-    `
-    : `
-      <div class="infoBox">
-        <b>⚠ Importante</b><br>
-        Usa esta opción solo cuando Disney+ ya te esté solicitando el <b>código de 6 dígitos</b>.<br>
-        <b>No presiones Reenviar código.</b><br>
-        Si tienes inconvenientes para encontrar el código, escríbenos por <b>WhatsApp</b>.
-      </div>
-    `;
-
-  const optionsHtml = isNetflix
-    ? `
-      <div class="modalSub">Selecciona la opción que te aparece en tu pantalla.</div>
-      <div class="optionGrid">
-        <button class="optionBtn" data-kind="option" data-value="viaje">Estoy de viaje</button>
-        <button class="optionBtn" data-kind="option" data-value="temporal">Ver temporalmente</button>
-        <button class="optionBtn" data-kind="option" data-value="hogar">Actualizar hogar</button>
-      </div>
-    `
-    : `
-      <div class="modalSub">Selecciona el motivo.</div>
-      <div class="optionGrid">
-        <button class="optionBtn" data-kind="motivo" data-value="Iniciar sesión (Celular/PC)">Iniciar sesión</button>
-        <button class="optionBtn" data-kind="motivo" data-value="Activar TV">Activar TV</button>
-        <button class="optionBtn" data-kind="motivo" data-value="Estoy fuera de casa">Estoy fuera de casa</button>
-      </div>
-    `;
+  if (isNetflix) {
+    state.netflixFlowStep = "start";
+    renderNetflixStartView(acc, remaining, isBlocked);
+    return;
+  }
 
   openModal(`
     <button id="modalX" class="modalClose">✕</button>
-    <div class="modalTitle">${esc(title)}</div>
+    <div class="modalTitle">Solicitar código Disney+</div>
     <div class="modalSub">${esc(acc.platformDisplay)} · ${esc(acc.profile || "—")}</div>
-    ${info}
-    ${optionsHtml}
+
+    <div class="infoBox">
+      <b>⚠ Importante</b><br>
+      Usa esta opción solo cuando Disney+ ya te esté solicitando el <b>código de 6 dígitos</b>.<br>
+      <b>No presiones Reenviar código.</b><br>
+      Si tienes inconvenientes para encontrar el código, escríbenos por <b>WhatsApp</b>.
+    </div>
+
+    <div class="modalSub">Selecciona el motivo.</div>
+    <div class="optionGrid">
+      <button class="optionBtn" data-kind="motivo" data-value="Iniciar sesión (Celular/PC)">Iniciar sesión</button>
+      <button class="optionBtn" data-kind="motivo" data-value="Activar TV">Activar TV</button>
+      <button class="optionBtn" data-kind="motivo" data-value="Estoy fuera de casa">Estoy fuera de casa</button>
+    </div>
 
     <div class="modalButtons">
       <button id="btnSearchCode" class="btn btnPrimary" disabled>Buscar código</button>
@@ -1629,17 +1869,16 @@ function openCodeModal(rowNumber){
 
   bindModalClose();
 
-    document.querySelectorAll("[data-kind]").forEach(btn => {
+  document.querySelectorAll("[data-kind]").forEach(btn => {
     btn.addEventListener("click", () => {
       if (isBlocked || remaining <= 0) return;
 
       document.querySelectorAll("[data-kind]").forEach(x => x.classList.remove("active"));
       btn.classList.add("active");
 
-      if (btn.dataset.kind === "option") state.activeCodeOption = btn.dataset.value;
       if (btn.dataset.kind === "motivo") state.activeCodeMotivo = btn.dataset.value;
 
-      $("#btnSearchCode").disabled = !(state.activeCodeOption || state.activeCodeMotivo);
+      $("#btnSearchCode").disabled = !state.activeCodeMotivo;
     });
   });
 
@@ -1660,6 +1899,7 @@ function openCodeModal(rowNumber){
     `;
     return;
   }
+}
 
     if(started){
     $("#btnSearchCode").disabled = true;
@@ -1718,9 +1958,12 @@ async function runCodeSearch(isRetry){
   }
 
   const isNetflix = state.activeCodeType === "NETFLIX" || state.activeCodeType === "NETFLIXPRO";
-
-  if(isNetflix && !state.activeCodeOption) return;
-  if(!isNetflix && !state.activeCodeMotivo) return;
+  
+  if (isNetflix && state.netflixGuideOption === "login" && !state.activeCodeOption) {
+  state.activeCodeOption = "login";
+}
+  if (isNetflix && !state.activeCodeOption && state.netflixGuideOption !== "login") return;
+  if (!isNetflix && !state.activeCodeMotivo) return;
 
   // ✅ NETFLIX: si eligió "Actualizar hogar", NO buscar código
   if (isNetflix && state.activeCodeOption === "hogar") {
