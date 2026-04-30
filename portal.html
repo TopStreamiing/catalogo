@@ -1326,23 +1326,23 @@ function showPortal(){
 
 
 function buildRenewMessage(acc){
-  return `*Hola TopStreaming 👋*\n_Quiero adelantar mi renovación._\n\n✅ Cuenta: *${acc.accountRaw}*\n✅ Perfil: ${acc.profile || "—"}\n💰 Monto: ${amountText(acc.amount)}\n📅 Fecha de renovación: ${acc.renewalDate || "—"}`;
+  return `*Hola TopStreaming 👋*\n_Quiero adelantar mi renovación._\n\n✅ Cuenta: *${acc.accountRaw}*\n🆔 ID compra: *#${acc.purchaseId || acc.rowNumber || "—"}*\n✅ Perfil: ${acc.profile || "—"}\n💰 Monto: ${amountText(acc.amount)}\n📅 Fecha de renovación: ${acc.renewalDate || "—"}`;
 }
 
 function buildReportMessage(acc){
-  return `*Hola TopStreaming 👋*\n\nNecesito soporte con mi cuenta en mantenimiento.\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n✅ Correo: ${acc.email || "—"}\n✅ Perfil: ${acc.profile || "—"}\n✅ Inconveniente: Cuenta en mantenimiento\n\nAgradecería su ayuda para revisarlo.`;
+  return `*Hola TopStreaming 👋*\n\nNecesito soporte con mi cuenta en mantenimiento.\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n🆔 ID compra: *#${acc.purchaseId || acc.rowNumber || "—"}*\n✅ Correo: ${acc.email || "—"}\n✅ Perfil: ${acc.profile || "—"}\n✅ Inconveniente: Cuenta en mantenimiento\n\nAgradecería su ayuda para revisarlo.`;
 }
 
 function buildSupportMessage(acc, issueText){
-  return `*Hola TopStreaming 👋*\n\nNecesito soporte con mi cuenta:\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n✅ Correo: ${acc.email || "—"}\n✅ Perfil: ${acc.profile || "—"}\n✅ Inconveniente: ${issueText || "—"}\n\nAgradecería su ayuda para revisarlo.`;
+  return `*Hola TopStreaming 👋*\n\nNecesito soporte con mi cuenta:\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n🆔 ID compra: *#${acc.purchaseId || acc.rowNumber || "—"}*\n✅ Correo: ${acc.email || "—"}\n✅ Perfil: ${acc.profile || "—"}\n✅ Inconveniente: ${issueText || "—"}\n\nAgradecería su ayuda para revisarlo.`;
 }
   
 function buildManualCodeSupportMessage(acc){
-  return `*Hola TopStreaming 👋*\n\nEstoy solicitando un código desde el portal de clientes, pero el sistema indica que este correo no está habilitado para búsqueda automática.\n\n📺 Cuenta: *${acc.accountRaw || "—"}*\n👤 Perfil: ${acc.profile || "—"}\n📧 Correo detectado: ${acc.email || "—"}\n🧩 Plataforma: ${acc.platformDisplay || acc.platformKey || "—"}\n\n¿Podrían ayudarme a obtener el código de acceso?\n\nGracias.`;
+  return `*Hola TopStreaming 👋*\n\nEstoy solicitando un código desde el portal de clientes, pero el sistema indica que este correo no está habilitado para búsqueda automática.\n\n📺 Cuenta: *${acc.accountRaw || "—"}*\n🆔 ID compra: *#${acc.purchaseId || acc.rowNumber || "—"}*\n👤 Perfil: ${acc.profile || "—"}\n📧 Correo detectado: ${acc.email || "—"}\n🧩 Plataforma: ${acc.platformDisplay || acc.platformKey || "—"}\n\n¿Podrían ayudarme a obtener el código de acceso?\n\nGracias.`;
 }
 
 function buildNetflixHomeUpdateMessage(acc){
-  return `*Hola TopStreaming 👋*\n\nEstoy usando el portal de clientes y en Netflix me aparece la opción *Actualizar hogar*.\n\nEntiendo que este caso ya no se resuelve con código automático y que requiere cambio de cuenta.\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n✅ Perfil: ${acc.profile || "—"}\n✅ Motivo: Actualizar hogar\n\nSolicito apoyo para el cambio de cuenta.\n\nGracias.`;
+  return `*Hola TopStreaming 👋*\n\nEstoy usando el portal de clientes y en Netflix me aparece la opción *Actualizar hogar*.\n\nEntiendo que este caso ya no se resuelve con código automático y que requiere cambio de cuenta.\n\n✅ Cuenta: *${acc.accountRaw || "—"}*\n🆔 ID compra: *#${acc.purchaseId || acc.rowNumber || "—"}*\n✅ Perfil: ${acc.profile || "—"}\n✅ Motivo: Actualizar hogar\n\nSolicito apoyo para el cambio de cuenta.\n\nGracias.`;
 }
   
 function renderCards(){
@@ -1384,9 +1384,10 @@ function renderCards(){
           </div>
 
           <div class="smallInfo">
-            <div>Cuenta: <b>${esc(acc.accountRaw)}</b></div>
-            <div>Fecha de renovación: <b>${esc(acc.renewalDate || "—")}</b></div>
-          </div>
+  <div>Cuenta: <b>${esc(acc.accountRaw)}</b></div>
+  <div>Fecha de renovación: <b>${esc(acc.renewalDate || "—")}</b></div>
+  <div>ID compra: <b>#${esc(acc.purchaseId || acc.rowNumber || "—")}</b></div>
+</div>
 
         
 
@@ -1531,7 +1532,7 @@ function openAccess(rowNumber){
 
       <div class="modalButtons">
         ${acc.email ? `<button class="btn btnGhost" onclick="copyText('${esc(acc.email)}')">Copiar correo</button>` : ``}
-        <button class="btn btnPrimary" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda con mi cuenta.\n\nCuenta: ${acc.accountRaw}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Contactar soporte</button>
+        <button class="btn btnPrimary" onclick="window.open('${whatsappLink(`Hola TopStreaming 👋\nNecesito ayuda con mi cuenta.\n\nCuenta: ${acc.accountRaw}\nID compra: #${acc.purchaseId || acc.rowNumber || "—"}\nPerfil: ${acc.profile || "—"}`)}','_blank','noopener')">Contactar soporte</button>
       </div>
     `);
   } else {
