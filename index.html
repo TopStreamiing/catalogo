@@ -500,14 +500,23 @@
   background: rgba(18,26,38,.35);
   display:none;
   position: relative;
+  aspect-ratio: 21 / 9;
 }
 
-.banner img{
+.bannerVideo{
   width:100%;
+  height:100%;
   display:block;
   object-fit:cover;
+  object-position:center;
   opacity:1;
   transition: opacity .55s ease;
+  pointer-events:none;
+  user-select:none;
+}
+
+.bannerVideo.fade-out{
+  opacity:0;
 }
 
 .bannerArrow{
@@ -544,13 +553,14 @@
 }
 
 @media (max-width:720px){
+  .banner{
+    aspect-ratio: 16 / 7;
+    border-radius: 16px;
+  }
+
   .bannerArrow{
     display:none;
   }
-}
-    
-.banner img.fade-out{
-  opacity:0;
 }
 
 /* Filtros iconos */
@@ -808,7 +818,19 @@
 
 <div class="banner" id="bannerBox">
   <button class="bannerArrow left" id="bannerPrev">❮</button>
-  <img id="bannerImg" alt="Noticia">
+
+  <video
+  id="bannerVideo"
+  class="bannerVideo"
+  autoplay
+  muted
+  loop
+  playsinline
+  preload="metadata"
+  draggable="false"
+  oncontextmenu="return false"
+></video>
+
   <button class="bannerArrow right" id="bannerNext">❯</button>
 </div>
 
@@ -1233,16 +1255,27 @@ $("dtImgWrap").innerHTML = seleccionado.imagen
 
 function setBanner(url){
   const box = $("bannerBox");
-  const img = $("bannerImg");
+  const video = $("bannerVideo");
   const u = String(url || "").trim();
 
-  if (!u){
+  if (!u || !video){
     box.style.display = "none";
     return;
   }
 
-  img.src = u;
   box.style.display = "block";
+
+  video.pause();
+  video.src = u;
+  video.load();
+
+  video.oncanplay = () => {
+    video.play().catch(() => {});
+  };
+
+  video.onerror = () => {
+    box.style.display = "none";
+  };
 }
 
 function renderIcons(icons){
@@ -1279,41 +1312,27 @@ function scrollIcons(dir){
   $("iconRow").scrollBy({ left: dir * 260, behavior: "smooth" });
 }
 
-function preloadImage(src){
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(src);
-    img.onerror = () => reject(src);
-    img.src = src;
-  });
-}
-
-async function getExistingBanners(){
-  const results = await Promise.allSettled(
-    BANNER_IMAGES.map(src => preloadImage(src))
-  );
-
-  return results
-    .filter(r => r.status === "fulfilled")
-    .map(r => r.value);
-}
-
 function changeBannerSmooth(nextSrc){
-  const img = $("bannerImg");
+  const video = $("bannerVideo");
   const box = $("bannerBox");
-  if (!img || !nextSrc) return;
+
+  if (!video || !nextSrc) return;
 
   box.style.display = "block";
-
-  img.classList.add("fade-out");
+  video.classList.add("fade-out");
 
   setTimeout(() => {
-    img.src = nextSrc;
-    img.onload = () => {
-      img.classList.remove("fade-out");
+    video.pause();
+    video.src = nextSrc;
+    video.load();
+
+    video.oncanplay = () => {
+      video.play().catch(() => {});
+      video.classList.remove("fade-out");
     };
-    img.onerror = () => {
-      img.classList.remove("fade-out");
+
+    video.onerror = () => {
+      video.classList.remove("fade-out");
     };
   }, 260);
 }
@@ -1353,24 +1372,20 @@ function startBannerRotation(){
 
   const isMobile = window.matchMedia("(max-width:720px)").matches;
 
+  bannerImages = BANNER_IMAGES;
+
   if (!bannerImages.length){
     $("bannerBox").style.display = "none";
     return;
   }
 
-  // Móvil: solo una portada aleatoria
+  // Móvil: solo una portada aleatoria en loop
   if (isMobile){
-  const randomIndex = Math.floor(Math.random() * bannerImages.length);
-  bannerIndex = randomIndex;
-  setBanner(bannerImages[bannerIndex]);
-
-  if (bannerTimer){
-    clearInterval(bannerTimer);
-    bannerTimer = null;
+    const randomIndex = Math.floor(Math.random() * bannerImages.length);
+    bannerIndex = randomIndex;
+    setBanner(bannerImages[bannerIndex]);
+    return;
   }
-
-  return;
-}
 
   // PC / tablet: rotación automática
   bannerIndex = 0;
@@ -1385,7 +1400,6 @@ function startBannerRotation(){
 }
 
 async function initBannerSystem(){
-  bannerImages = await getExistingBanners();
   startBannerRotation();
 }
 
@@ -2493,11 +2507,11 @@ const ICONOS = [
   { name:"Seguidores", icon:"assets/icons/RRSS.webp" }
 ];
 const BANNER_IMAGES = [
-  "assets/portadas/portada1.webp",
-  "assets/portadas/portada2.webp",
-  "assets/portadas/portada3.webp",
-  "assets/portadas/portada4.webp",
-  "assets/portadas/portada5.webp"
+  "assets/portadas/portada1.webm",
+  "assets/portadas/portada2.webm",
+  "assets/portadas/portada3.webm",
+  "assets/portadas/portada4.webm",
+  "assets/portadas/portada5.webm"
 ];
 
     
