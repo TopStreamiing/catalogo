@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <title>Portal Interno | Chesttop</title>
+  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <div class="page-bg"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="../assets/LogoTop.png" alt="Chesttop" class="brand-logo" />
+    </div>
+
+    <div class="top-actions">
+      <button class="currency-btn" type="button">
+        PEN <span>S/</span>
+      </button>
+
+      <button class="menu-btn" type="button" aria-label="Menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="login-card">
+      <div class="card-glow"></div>
+
+      <h1>Iniciar sesión</h1>
+      <p class="subtitle">Accede al portal interno</p>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="field-group">
+          <label for="usuario">Escribe tu usuario:</label>
+          <input
+            id="usuario"
+            name="usuario"
+            type="text"
+            placeholder="Tu usuario"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="password">Escribe tu contraseña:</label>
+
+          <div class="password-wrap">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Tu contraseña"
+              autocomplete="new-password"
+            />
+            <button id="togglePassword" type="button">Ver</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="correo">Escribe tu correo:</label>
+          <input
+            id="correo"
+            name="correo"
+            type="email"
+            placeholder="Correo autorizado"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="cloudflare-box">
+          <div class="check-circle">
+            <span>✓</span>
+          </div>
+
+          <div class="cf-text">
+            <strong>Verificación lista</strong>
+            <small>Protección de acceso activa</small>
+          </div>
+
+          <div class="cf-brand">
+            <strong>CLOUDFLARE</strong>
+            <small>Privacidad · Ayuda</small>
+          </div>
+        </div>
+
+        <button id="btnEnviar" class="submit-btn" type="submit" disabled>
+          Enviar código de acceso
+        </button>
+
+        <p id="mensaje" class="message">
+          Ingresa tus datos para continuar.
+        </p>
+      </form>
+
+      <p class="footer-note">
+        Acceso exclusivo para personal autorizado
+      </p>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
