@@ -95,6 +95,23 @@
           Enviar código de acceso
         </button>
 
+        <div id="otpBox" class="otp-box hidden">
+  <label for="codigoOtp">Código recibido:</label>
+
+  <input
+    id="codigoOtp"
+    type="text"
+    inputmode="numeric"
+    maxlength="6"
+    placeholder="000000"
+    autocomplete="one-time-code"
+  />
+
+  <button id="btnVerificar" class="verify-btn" type="button" disabled>
+    Verificar código
+  </button>
+</div>
+
         <p id="mensaje" class="message">
           Ingresa tus datos para continuar.
         </p>
